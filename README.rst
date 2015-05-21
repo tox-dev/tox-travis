@@ -1,6 +1,6 @@
-======================================================
-tox-travis: Seamless integration of Tox into Travis CI
-======================================================
+=====================================
+tox-travis: Integrate Tox into Travis
+=====================================
 
 tox-travis is a simple plugin for tox that allows you to use
 Travis CI's multiple python version feature as well as tox's
