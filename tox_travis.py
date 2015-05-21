@@ -1,4 +1,3 @@
-"""Seamless integration of Tox into Travis CI."""
 import os
 import py
 import tox

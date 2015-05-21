@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='tox-travis',
-    description='Seamless integration of Tox into Travis CI.',
+    description='Seamless integration of Tox into Travis CI',
     long_description=open('README.rst', 'rb').read().decode('utf-8'),
     author='Ryan Hiebert',
     author_email='ryan@ryanhiebert.com',

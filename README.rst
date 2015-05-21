@@ -1,8 +1,10 @@
-==========
-tox-travis
-==========
+======================================================
+tox-travis: Seamless integration of Tox into Travis CI
+======================================================
 
-Seamless integration of Tox into Travis CI.
+tox-travis is a simple plugin for tox that allows you to use
+Travis CI's multiple python version feature as well as tox's
+full configurability in a straightforward way.
 
 
 Usage
@@ -10,7 +12,7 @@ Usage
 
 Configure the Python versions to test with in ``travis.yml``:
 
-.. code-block:: yml
+.. code-block::
 
     sudo: false
     language: python
@@ -20,8 +22,16 @@ Configure the Python versions to test with in ``travis.yml``:
     install: pip install tox-travis
     script: tox
 
-Then add a section to ``tox.ini``, telling it what environments to run
-under which versions of Python:
+And it will run the appropriate testenvs,
+which are ``py27`` and ``py34`` in the example above.
+
+
+Advanced Configuration
+======================
+
+To customize what environments tox will run on Travis,
+add a section to ``tox.ini`` telling it what environments
+to run under which versions of Python:
 
 .. code-block:: ini
 
@@ -31,18 +41,3 @@ under which versions of Python:
     [tox:travis]
     2.7 = py27-django{17,18}
     3.4 = py34-django{17,18}, docs
-
-If the version that Travis is running isn't avaliable,
-it'll use these defaults:
-
-.. code-block:: ini
-
-    [tox:travis]
-    2.6 = py26
-    2.7 = py27
-    3.2 = py32
-    3.3 = py33
-    3.4 = py34
-    3.5 = py35
-    pypy = pypy
-    pypy3 = pypy3
