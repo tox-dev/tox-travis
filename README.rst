@@ -29,6 +29,5 @@ under which versions of Python:
     envlist = py{27,34}-django{17,18}, docs
 
     [tox:travis]
-    envlist =
-        py27: py27-django{17,18}
-        py34: py34-django{17,18}, docs
+    2.7 = py27-django{17,18}
+    3.4 = py34-django{17,18}, docs
