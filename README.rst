@@ -41,3 +41,8 @@ to run under which versions of Python:
     [tox:travis]
     2.7 = py27-django{17,18}
     3.4 = py34-django{17,18}, docs
+
+Note that Travis won't run all the envs simultaneously,
+because it's build matrix is only aware of the Python versions.
+Only one Travis build will be run per Python version,
+unless other settings are sepecified in the Travis build matrix.
