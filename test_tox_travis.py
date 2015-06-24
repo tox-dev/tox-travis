@@ -34,18 +34,19 @@ envlist = py{27,34}-django, other
 
 class TestToxTravis:
     def tox_envs(self):
+        """Find the envs that tox sees."""
         output = subprocess.Popen(
             ['tox', '-l'], stdout=subprocess.PIPE).communicate()[0]
-        return set(output.decode('utf-8').strip().split())
+        return output.decode('utf-8').strip().split()
 
     def test_not_travis(self, tmpdir):
         os.chdir(str(tmpdir))
         tmpdir.join('tox.ini').write(tox_ini)
 
-        expected = set([
+        expected = [
             'py26', 'py27', 'py32', 'py33', 'py34',
             'pypy', 'pypy3', 'docs',
-        ])
+        ]
 
         assert self.tox_envs() == expected
 
@@ -56,7 +57,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.6')
 
-        assert self.tox_envs() == set(['py26'])
+        assert self.tox_envs() == ['py26']
 
     def test_travis_default_27(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -65,7 +66,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
 
-        assert self.tox_envs() == set(['py27'])
+        assert self.tox_envs() == ['py27']
 
     def test_travis_default_32(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -74,7 +75,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.2')
 
-        assert self.tox_envs() == set(['py32'])
+        assert self.tox_envs() == ['py32']
 
     def test_travis_default_33(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -83,7 +84,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.3')
 
-        assert self.tox_envs() == set(['py33'])
+        assert self.tox_envs() == ['py33']
 
     def test_travis_default_34(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -92,7 +93,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
 
-        assert self.tox_envs() == set(['py34'])
+        assert self.tox_envs() == ['py34']
 
     def test_travis_default_pypy(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -101,7 +102,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', 'pypy')
 
-        assert self.tox_envs() == set(['pypy'])
+        assert self.tox_envs() == ['pypy']
 
     def test_travis_default_pypy3(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -110,7 +111,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', 'pypy3')
 
-        assert self.tox_envs() == set(['pypy3'])
+        assert self.tox_envs() == ['pypy3']
 
     def test_travis_override(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -119,7 +120,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
 
-        assert self.tox_envs() == set(['py27', 'docs'])
+        assert self.tox_envs() == ['py27', 'docs']
 
     def test_respect_overridden_toxenv(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -129,7 +130,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
         monkeypatch.setenv('TOXENV', 'py32')
 
-        assert self.tox_envs() == set(['py32'])
+        assert self.tox_envs() == ['py32']
 
     def test_keep_if_no_match(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -138,7 +139,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
 
-        assert self.tox_envs() == set(['py27'])
+        assert self.tox_envs() == ['py27']
 
     def test_default_tox_ini_overrides(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -147,7 +148,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
 
-        assert self.tox_envs() == set(['py27-django'])
+        assert self.tox_envs() == ['py27-django']
 
     def test_factors(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -156,7 +157,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
 
-        assert self.tox_envs() == set(['py34', 'py34-docs', 'py34-django'])
+        assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django']
 
     def test_django_factors(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -165,7 +166,7 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
 
-        assert self.tox_envs() == set(['py27-django', 'py34-django'])
+        assert self.tox_envs() == ['py27-django', 'py34-django']
 
     def test_non_python_factor(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
@@ -174,4 +175,4 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
 
-        assert self.tox_envs() == set(['other'])
+        assert self.tox_envs() == ['other']
