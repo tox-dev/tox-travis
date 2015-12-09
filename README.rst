@@ -42,8 +42,8 @@ to run under which versions of Python:
     envlist = py{27,34}-django{17,18}, docs
 
     [tox:travis]
-    2.7 = py27
-    3.4 = py34, docs
+    2.7 = py27-django{17,18}
+    3.4 = py34-django{17,18}, docs
 
 This would run the Python 2.7 variants under 2.7,
 and the Python 3.4 variants and the ``docs`` env under 3.4.
