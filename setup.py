@@ -1,9 +1,13 @@
 from setuptools import setup
 
+
+def fread(fn):
+    return open(fn, 'rb').read().decode('utf-8')
+
 setup(
     name='tox-travis',
     description='Seamless integration of Tox into Travis CI',
-    long_description=open('README.rst', 'rb').read().decode('utf-8'),
+    long_description=fread('README.rst') + '\n\n' + fread('HISTORY.rst'),
     author='Ryan Hiebert',
     author_email='ryan@ryanhiebert.com',
     url='https://github.com/ryanhiebert/tox-travis',
