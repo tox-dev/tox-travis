@@ -1,5 +1,5 @@
-0.2 (TBD)
-+++++++++
+0.2 (2015-12-10)
+++++++++++++++++
 
 * Choose testenvs from ``tox.ini`` by matching factors.
 
