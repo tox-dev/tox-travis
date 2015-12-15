@@ -51,4 +51,4 @@ and the Python 3.4 variants and the ``docs`` env under 3.4.
 Note that Travis won't run all the envs simultaneously,
 because it's build matrix is only aware of the Python versions.
 Only one Travis build will be run per Python version,
-unless other settings are sepecified in the Travis build matrix.
+unless other settings are specified in the Travis build matrix.
