@@ -30,21 +30,30 @@ def tox_addoption(parser):
 
     # Find the envs that tox knows about
     envlist = split_env(tox_section.get('envlist', []))
+    envlist_set = set(envlist)
+    envlist.extend(
+        s[8:] for s in sorted(config.sections, key=config.lineof)
+        if s.startswith('testenv:')
+        and s[8:] not in envlist_set)
 
     # Find and expand the requested envs
     envstr = travis_section.get(version, TOX_DEFAULTS.get(version))
     desired_envlist = split_env(envstr)
 
-    matched = [
-        env for env in envlist if any(
-            env_matches(env, desired_env)
-            for desired_env in desired_envlist
-        )
-    ]
+    matched = []
+    matchmakers = set()
+    for env in envlist:
+        match = False
+        for desired_env in desired_envlist:
+            if env_matches(env, desired_env):
+                match = True
+                matchmakers.add(desired_env)
+        if match:
+            matched.append(env)
 
-    # If no envs match, just use the desired envstr directly
-    if not matched:
-        matched = [envstr]
+    # Add desired envs which yielded no match with the envlist
+    matched.extend(env for env in desired_envlist
+                   if env not in matchmakers)
 
     os.environ.setdefault('TOXENV', ','.join(matched))
 

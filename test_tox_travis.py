@@ -14,12 +14,26 @@ tox_ini_override = tox_ini + b"""
 
 tox_ini_factors = b"""
 [tox]
-envlist = py34, py34-docs, py34-django
+envlist = py34, py34-docs, py34-django, dontmatch-1
 """
 
 tox_ini_factors_override = tox_ini_factors + b"""
 [tox:travis]
 2.7 = py27-django
+"""
+
+tox_ini_factors_override_nonenvlist = tox_ini_factors + b"""
+[tox:travis]
+3.4 = py34, extra
+
+[testenv:extra-coveralls]
+basepython=python3.4
+
+[testenv:extra-flake8]
+basepython=python3.4
+
+[testenv:dontmatch-2]
+basepython=python3.4
 """
 
 tox_ini_django_factors = b"""
@@ -158,6 +172,16 @@ class TestToxTravis:
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
 
         assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django']
+
+    def test_match_and_keep(self, tmpdir, monkeypatch):
+        os.chdir(str(tmpdir))
+        tmpdir.join('tox.ini').write(tox_ini_factors_override_nonenvlist)
+
+        monkeypatch.setenv('TRAVIS', 'true')
+        monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
+
+        assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django',
+                                   'extra-coveralls', 'extra-flake8']
 
     def test_django_factors(self, tmpdir, monkeypatch):
         os.chdir(str(tmpdir))
