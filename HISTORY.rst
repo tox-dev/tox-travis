@@ -1,3 +1,12 @@
+0.3 (2016-01-26)
+++++++++++++++++
+
+* Match against testenvs that are only declared as sections (#7)
+  thanks to @epsy
+* Include unmatched envs verbatim to run (also #7)
+  thanks to @epsy again
+
+
 0.2 (2015-12-10)
 ++++++++++++++++
 
