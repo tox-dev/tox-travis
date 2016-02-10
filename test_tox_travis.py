@@ -70,6 +70,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.6')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,6')
 
         assert self.tox_envs() == ['py26']
 
@@ -79,6 +80,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,7')
 
         assert self.tox_envs() == ['py27']
 
@@ -88,6 +90,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.2')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,3,2')
 
         assert self.tox_envs() == ['py32']
 
@@ -97,6 +100,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.3')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,3,3')
 
         assert self.tox_envs() == ['py33']
 
@@ -106,6 +110,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,3,4')
 
         assert self.tox_envs() == ['py34']
 
@@ -115,6 +120,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', 'pypy')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'PyPy,2,7')
 
         assert self.tox_envs() == ['pypy']
 
@@ -124,6 +130,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', 'pypy3')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'PyPy,3,2')
 
         assert self.tox_envs() == ['pypy3']
 
@@ -133,6 +140,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,7')
 
         assert self.tox_envs() == ['py27', 'docs']
 
@@ -142,6 +150,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,7')
         monkeypatch.setenv('TOXENV', 'py32')
 
         assert self.tox_envs() == ['py32']
@@ -152,6 +161,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,7')
 
         assert self.tox_envs() == ['py27']
 
@@ -161,6 +171,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,7')
 
         assert self.tox_envs() == ['py27-django']
 
@@ -170,6 +181,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,3,4')
 
         assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django']
 
@@ -179,6 +191,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,3,4')
 
         assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django',
                                    'extra-coveralls', 'extra-flake8']
@@ -189,6 +202,7 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '2.7')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,2,7')
 
         assert self.tox_envs() == ['py27-django', 'py34-django']
 
@@ -198,5 +212,6 @@ class TestToxTravis:
 
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.4')
+        monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', 'CPython,3,4')
 
         assert self.tox_envs() == ['other']

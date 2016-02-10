@@ -45,10 +45,24 @@ def get_declared_envs(config):
     return envlist + [env for env in section_envs if env not in envlist]
 
 
+def get_version_info():
+    """Get version info from the sys module.
+
+    Override from environment for testing.
+    """
+    overrides = os.environ.get('__TOX_TRAVIS_SYS_VERSION')
+    if overrides:
+        version, major, minor = overrides.split(',')[:3]
+        major, minor = int(major), int(minor)
+    else:
+        version, (major, minor) = sys.version, sys.version_info[:2]
+    return version, major, minor
+
+
 def guess_python_env():
     """Guess the default python env to use."""
-    major, minor = sys.version_info[:2]
-    if 'PyPy' in sys.version:
+    version, major, minor = get_version_info()
+    if 'PyPy' in version:
         return 'pypy3' if major == 3 else 'pypy'
     return 'py{major}{minor}'.format(major=major, minor=minor)
 
