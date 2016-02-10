@@ -1,20 +1,9 @@
 import os
+import sys
 import py
 import tox
 
 from tox.config import _split_env as split_env
-
-
-TOX_DEFAULTS = {
-    '2.6': 'py26',
-    '2.7': 'py27',
-    '3.2': 'py32',
-    '3.3': 'py33',
-    '3.4': 'py34',
-    '3.5': 'py35',
-    'pypy': 'pypy',
-    'pypy3': 'pypy3',
-}
 
 
 @tox.hookimpl
@@ -56,10 +45,18 @@ def get_declared_envs(config):
     return envlist + [env for env in section_envs if env not in envlist]
 
 
+def guess_python_env():
+    """Guess the default python env to use."""
+    major, minor = sys.version_info[:2]
+    if 'PyPy' in sys.version:
+        return 'pypy3' if major == 3 else 'pypy'
+    return 'py{major}{minor}'.format(major=major, minor=minor)
+
+
 def get_desired_envs(config, version):
     """Get the expanded list of desired envs."""
     travis_section = config.sections.get('tox:travis', {})
-    return split_env(travis_section.get(version, TOX_DEFAULTS.get(version)))
+    return split_env(travis_section.get(version, guess_python_env()))
 
 
 def match_envs(declared_envs, desired_envs):
@@ -77,6 +74,7 @@ def match_envs(declared_envs, desired_envs):
         if not any(env_matches(declared, desired) for declared in declared_envs)
     ]
     return matched + unmatched
+
 
 def env_matches(declared, desired):
     """Determine if a declared env matches a desired env.
