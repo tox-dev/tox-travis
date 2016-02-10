@@ -1,5 +1,5 @@
-0.4 (TBD)
-+++++++++
+0.4 (2016-02-10)
+++++++++++++++++
 
 * Generate default env from sys.version_info (#9)
   - thanks to @jayvdb for the bug report
