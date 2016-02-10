@@ -79,6 +79,13 @@ class TestToxTravis:
         ]
         assert self.tox_envs() == expected
 
+    def test_any_default(self, tmpdir, monkeypatch):
+        self.configure(tmpdir, monkeypatch, tox_ini)
+        monkeypatch.setenv('TRAVIS', 'true')
+        tox_envs = self.tox_envs()
+        assert len(tox_envs) == 1
+        assert tox_envs[0].startswith('py')
+
     def test_travis_default_26(self, tmpdir, monkeypatch):
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 6)
         assert self.tox_envs() == ['py26']
