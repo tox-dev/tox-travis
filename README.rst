@@ -2,6 +2,13 @@
 tox-travis: Integrate Tox into Travis
 =====================================
 
+.. image:: https://img.shields.io/pypi/v/tox-travis.svg
+    :target: https://pypi.python.org/pypi/tox-travis
+    :alt: Latest Version
+
+.. image:: https://travis-ci.org/ryanhiebert/tox-travis.svg?branch=master
+    :target: https://travis-ci.org/ryanhiebert/tox-travis
+
 tox-travis is a simple plugin for tox that allows you to use
 Travis CI's multiple python version feature as well as tox's
 full configurability in a straightforward way.
