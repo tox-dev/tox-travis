@@ -59,3 +59,8 @@ Note that Travis won't run all the envs simultaneously,
 because it's build matrix is only aware of the Python versions.
 Only one Travis build will be run per Python version,
 unless other settings are specified in the Travis build matrix.
+
+
+.. image:: https://badges.gitter.im/ryanhiebert/tox-travis.svg
+   :alt: Join the chat at https://gitter.im/ryanhiebert/tox-travis
+   :target: https://gitter.im/ryanhiebert/tox-travis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
