@@ -10,3 +10,8 @@ python:
  - "nightly"
 install: pip install .
 script: tox
+branches:
+  only:
+    - master
+matrix:
+  fast_finish: true
