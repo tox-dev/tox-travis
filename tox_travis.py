@@ -12,6 +12,7 @@ TOX_DEFAULTS = {
     '3.3': 'py33',
     '3.4': 'py34',
     '3.5': 'py35',
+    '3.6': 'py36',
     'pypy': 'pypy',
     'pypy3': 'pypy3',
 }
@@ -59,7 +60,13 @@ def get_declared_envs(config):
 def get_desired_envs(config, version):
     """Get the expanded list of desired envs."""
     travis_section = config.sections.get('tox:travis', {})
-    return split_env(travis_section.get(version, TOX_DEFAULTS.get(version)))
+    desired_envlist = travis_section.get(version, TOX_DEFAULTS.get(version))
+
+    if desired_envlist is None:
+        msg = 'No default known for python {version}'
+        raise UnknownDefaultError(msg.format(version=version))
+
+    return split_env(desired_envlist)
 
 
 def match_envs(declared_envs, desired_envs):
@@ -78,6 +85,7 @@ def match_envs(declared_envs, desired_envs):
     ]
     return matched + unmatched
 
+
 def env_matches(declared, desired):
     """Determine if a declared env matches a desired env.
 
@@ -89,3 +97,7 @@ def env_matches(declared, desired):
     desired_factors = desired.split('-')
     declared_factors = declared.split('-')
     return all(factor in declared_factors for factor in desired_factors)
+
+
+class UnknownDefaultError(Exception):
+    """No default env is known for the attempted python version."""
