@@ -54,21 +54,26 @@ class TestToxTravis:
         return output.decode('utf-8').strip().split()
 
     def configure(self, tmpdir, monkeypatch, tox_ini,
-                  version=None, major=None, minor=None):
+                  version=None, major=None, minor=None, travis_version=None):
         os.chdir(str(tmpdir))
         tmpdir.join('tox.ini').write(tox_ini)
+
+        if version or travis_version:
+            monkeypatch.setenv('TRAVIS', 'true')
 
         if version:
             sys_version = '{version},{major},{minor}'.format(
                 version=version, major=major, minor=minor)
-            travis_version = '{major}.{minor}'.format(
-                major=major, minor=minor)
-            if version == 'PyPy':
-                travis_version = 'pypy3' if major == 3 else 'pypy'
+            if not travis_version:
+                travis_version = '{major}.{minor}'.format(
+                    major=major, minor=minor)
+                if version == 'PyPy':
+                    travis_version = 'pypy3' if major == 3 else 'pypy'
 
-            monkeypatch.setenv('TRAVIS', 'true')
-            monkeypatch.setenv('TRAVIS_PYTHON_VERSION', travis_version)
             monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', sys_version)
+
+        if travis_version:
+            monkeypatch.setenv('TRAVIS_PYTHON_VERSION', travis_version)
 
 
     def test_not_travis(self, tmpdir, monkeypatch):
@@ -113,6 +118,35 @@ class TestToxTravis:
     def test_travis_default_pypy3(self, tmpdir, monkeypatch):
         self.configure(tmpdir, monkeypatch, tox_ini, 'PyPy', 3, 2)
         assert self.tox_envs() == ['pypy3']
+
+    def test_travis_python_version_py27(self, tmpdir, monkeypatch):
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
+        assert self.tox_envs() == ['py27']
+
+    def test_travis_python_version_py35(self, tmpdir, monkeypatch):
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5')
+        assert self.tox_envs() == ['py35']
+
+    def test_travis_python_version_pypy(self, tmpdir, monkeypatch):
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='pypy')
+        assert self.tox_envs() == ['pypy']
+
+    def test_travis_python_version_pypy3(self, tmpdir, monkeypatch):
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='pypy3')
+        assert self.tox_envs() == ['pypy3']
+
+    def test_travis_not_matching(self, tmpdir, monkeypatch):
+        """TRAVIS_PYTHON_VERSION should be preferred.
+
+        When that environment variable isn't set, we automatically
+        generate a likely env to be the default. However, there
+        are some cases where the TRAVIS_PYTHON_VERSION and the
+        default python version may be different. Most notably,
+        when using an ``os`` of ``osx``, which doesn't have
+        support for the ``python`` factor.
+        """
+        self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7, '3.5')
+        assert self.tox_envs() == ['py35']
 
     def test_travis_override(self, tmpdir, monkeypatch):
         tox_ini = tox_ini_override
