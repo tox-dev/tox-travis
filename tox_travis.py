@@ -72,22 +72,19 @@ def get_default_envlist(version):
     """Parse a default tox env based on the version.
 
     The version comes from the ``TRAVIS_PYTHON_VERSION`` environment
-    variable. If that isn't set, then use sys.version_info to come
-    up with a reasonable default.
+    variable. If that isn't set or is invalid, then use
+    sys.version_info to come up with a reasonable default.
     """
-    # If version isn't set, then guess from sys.version_info
-    if not version:
-        return guess_python_env()
+    if version in ['pypy', 'pypy3']:
+        return version
 
-    # Assume single digit versions
-    match = re.match(r'^(\d)\.(\d)$', version)
+    # Assume single digit major and minor versions
+    match = re.match(r'^(\d)\.(\d)(?:\.\d+)?$', version or '')
     if match:
         major, minor = match.groups()
         return 'py{major}{minor}'.format(major=major, minor=minor)
 
-    # Use the ``TRAVIS_PYTHON_VERSION`` verbatim. This works for
-    # at least pypy and pypy3.
-    return version
+    return guess_python_env()
 
 
 def get_desired_envs(config, version):

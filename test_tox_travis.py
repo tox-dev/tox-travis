@@ -148,6 +148,12 @@ class TestToxTravis:
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7, '3.5')
         assert self.tox_envs() == ['py35']
 
+    def test_travis_nightly(self, tmpdir, monkeypatch):
+        """When nightly is specified, it should use sys.version_info."""
+        self.configure(tmpdir, monkeypatch, tox_ini,
+                       'CPython', 3, 5, 'nightly')
+        assert self.tox_envs() == ['py35']
+
     def test_travis_override(self, tmpdir, monkeypatch):
         tox_ini = tox_ini_override
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
