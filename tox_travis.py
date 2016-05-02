@@ -1,5 +1,6 @@
 import os
 import sys
+import re
 import py
 import tox
 
@@ -67,10 +68,30 @@ def guess_python_env():
     return 'py{major}{minor}'.format(major=major, minor=minor)
 
 
+def get_default_envlist(version):
+    """Parse a default tox env based on the version.
+
+    The version comes from the ``TRAVIS_PYTHON_VERSION`` environment
+    variable. If that isn't set or is invalid, then use
+    sys.version_info to come up with a reasonable default.
+    """
+    if version in ['pypy', 'pypy3']:
+        return version
+
+    # Assume single digit major and minor versions
+    match = re.match(r'^(\d)\.(\d)(?:\.\d+)?$', version or '')
+    if match:
+        major, minor = match.groups()
+        return 'py{major}{minor}'.format(major=major, minor=minor)
+
+    return guess_python_env()
+
+
 def get_desired_envs(config, version):
     """Get the expanded list of desired envs."""
     travis_section = config.sections.get('tox:travis', {})
-    return split_env(travis_section.get(version, guess_python_env()))
+    default_envlist = get_default_envlist(version)
+    return split_env(travis_section.get(version, default_envlist))
 
 
 def match_envs(declared_envs, desired_envs):
