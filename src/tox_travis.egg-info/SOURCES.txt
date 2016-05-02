@@ -1,0 +1,13 @@
+HISTORY.rst
+LICENSE
+MANIFEST.in
+README.rst
+setup.cfg
+setup.py
+src/tox_travis.py
+src/tox_travis.egg-info/PKG-INFO
+src/tox_travis.egg-info/SOURCES.txt
+src/tox_travis.egg-info/dependency_links.txt
+src/tox_travis.egg-info/entry_points.txt
+src/tox_travis.egg-info/requires.txt
+src/tox_travis.egg-info/top_level.txt
