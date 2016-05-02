@@ -1,5 +1,5 @@
 __pycache__/
-/*.egg-info/
+*.egg-info/
 /.tox/
 /.cache/
 /build/
