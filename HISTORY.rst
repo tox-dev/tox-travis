@@ -1,3 +1,9 @@
+0.5 (TBD)
++++++++++
+
+* Prefer ``TRAVIS_PYTHON_VERSION`` to sys.version_info (#14)
+  - thanks to @jayvdb for the code review
+
 0.4 (2016-02-10)
 ++++++++++++++++
 
