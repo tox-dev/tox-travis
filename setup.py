@@ -19,12 +19,16 @@ setup(
         'tox': ['travis = tox_travis'],
     },
     install_requires=['tox>=2.0'],
+    extras_require={
+        ':python_version=="3.2"': ['virtualenv<14'],
+    },
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
