@@ -1,6 +1,8 @@
 sudo: false
-language: python
-install: pip install .
+os:
+  - linux
+  - osx
+language: generic
 script: env
 branches:
   only:
