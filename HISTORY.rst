@@ -3,6 +3,8 @@
 
 * Prefer ``TRAVIS_PYTHON_VERSION`` to sys.version_info (#14)
   - thanks to @jayvdb for the code review
+* Add Python 3.2 support (#17)
+  - thanks to @jayvdb for the bug report, discussion, and code review
 
 0.4 (2016-02-10)
 ++++++++++++++++
