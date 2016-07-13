@@ -21,6 +21,7 @@ setup(
     install_requires=['tox>=2.0'],
     extras_require={
         ':python_version=="3.2"': ['virtualenv<14'],
+        ':platform_python_implementation=="PyPy" and python_version=="3.3"': ['virtualenv>=15.0.2'],
     },
     classifiers=[
         'Programming Language :: Python',
