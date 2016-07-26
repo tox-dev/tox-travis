@@ -5,6 +5,10 @@ import py
 import tox
 
 from tox.config import _split_env as split_env
+try:
+    from tox.config import default_factors
+except ImportError:
+    default_factors = None
 
 
 @tox.hookimpl
@@ -23,6 +27,14 @@ def tox_addoption(parser):
 
     matched = match_envs(declared_envs, desired_envs)
     os.environ.setdefault('TOXENV', ','.join(matched))
+
+    # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
+    # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
+    # is in the PATH.
+    # https://github.com/travis-ci/travis-ci/issues/6304
+    # Force use of the virtualenv `python`.
+    if version and default_factors and version.startswith('pypy3.3-5.2-'):
+        default_factors['pypy3'] = 'python'
 
 
 def get_declared_envs(config):
