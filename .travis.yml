@@ -14,8 +14,7 @@ python:
 
 before_install:
  # Show the current setuptools version
- - ORIG_SETUPTOOLS_VERSION=`python -c "import setuptools; print('%s' % setuptools.__version__)"`
- - echo setuptools $ORIG_SETUPTOOLS_VERSION
+ - python -c "import setuptools; print(setuptools.__version__)"
 install:
  - pip install wheel
  - python setup.py install bdist_wheel
