@@ -1,10 +1,12 @@
-0.5 (TBD)
-+++++++++
+0.5 (2016-07-28)
+++++++++++++++++
 
 * Prefer ``TRAVIS_PYTHON_VERSION`` to sys.version_info (#14)
   - thanks to @jayvdb for the code review
 * Add Python 3.2 support (#17)
   - thanks to @jayvdb for the bug report, discussion, and code review
+* Support PyPy3 v5.2 with setuptools hackery (#24)
+  - thanks to @jayvdb for the pull request
 
 0.4 (2016-02-10)
 ++++++++++++++++
