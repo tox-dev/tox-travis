@@ -72,7 +72,7 @@ setup(
     },
     install_requires=['tox>=2.0'],
     extras_require={
-        ':python_version=="3.2"': ['virtualenv<14'],
+        ':python_version=="3.2"': ['virtualenv<14', 'pytest<3'],
         ':platform_python_implementation=="PyPy" and python_version=="3.3"': ['virtualenv>=15.0.2'],
     },
     classifiers=[
