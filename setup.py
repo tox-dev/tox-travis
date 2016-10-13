@@ -64,7 +64,7 @@ setup(
     author_email='ryan@ryanhiebert.com',
     url='https://github.com/ryanhiebert/tox-travis',
     license='MIT',
-    version='0.5',
+    version='0.6',
     package_dir={'': 'src'},
     py_modules=['tox_travis'],
     entry_points={
