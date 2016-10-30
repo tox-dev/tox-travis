@@ -45,6 +45,20 @@ envlist = py{27,34}-django, other
 3.4 = other
 """
 
+tox_ini_travis_env = b"""
+[tox]
+envlist = py{27,35}-django{19,110}
+
+[tox:travis]
+TRAVIS_PYTHON_VERSION =
+    2.7: py27
+    3.5: py35
+
+DJANGO =
+    1.9: django19
+    1.10: django110
+"""
+
 
 class TestToxTravis:
     def tox_envs(self):
@@ -54,7 +68,8 @@ class TestToxTravis:
         return output.decode('utf-8').strip().split()
 
     def configure(self, tmpdir, monkeypatch, tox_ini,
-                  version=None, major=None, minor=None, travis_version=None):
+                  version=None, major=None, minor=None,
+                  travis_version=None, travis_env=None):
         os.chdir(str(tmpdir))
         tmpdir.join('tox.ini').write(tox_ini)
 
@@ -75,6 +90,9 @@ class TestToxTravis:
         if travis_version:
             monkeypatch.setenv('TRAVIS_PYTHON_VERSION', travis_version)
 
+        if isinstance(travis_env, dict):
+            for key, value in travis_env.items():
+                monkeypatch.setenv(key, value)
 
     def test_not_travis(self, tmpdir, monkeypatch):
         self.configure(tmpdir, monkeypatch, tox_ini)
@@ -194,3 +212,14 @@ class TestToxTravis:
         tox_ini = tox_ini_django_factors
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4)
         assert self.tox_envs() == ['other']
+
+    def test_travis_env(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_env
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
+        assert self.tox_envs() == ['py27-django19', 'py27-django110']
+
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7', travis_env={'DJANGO': '1.9'})
+        assert self.tox_envs() == ['py27-django19']
+
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5', travis_env={'DJANGO': '1.10'})
+        assert self.tox_envs() == ['py35-django110']

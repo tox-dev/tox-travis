@@ -102,8 +102,47 @@ def get_default_envlist(version):
 def get_desired_envs(config, version):
     """Get the expanded list of desired envs."""
     travis_section = config.sections.get('tox:travis', {})
+    if 'TRAVIS_PYTHON_VERSION' in travis_section:
+        # Use the travis section and environment variables
+        # to determine the desired tox factors.
+        desired_factors = [
+            get_env_factor(travis_section, envvar)
+            for envvar in travis_section
+        ]
+
+        # filter empty factors and join
+        env = '-'.join(filter(None, desired_factors))
+        return [env]
+
     default_envlist = get_default_envlist(version)
     return split_env(travis_section.get(version, default_envlist))
+
+
+def get_env_factor(travis_section, envvar):
+    """Derive a tox factor from the tox:travis section using
+    the current environment variables. For example, given the
+    following tox:travis section:
+
+        [tox:travis]
+        TRAVIS_PYTHON_VERSION =
+            2.7: py27
+            3.5: py35
+
+        DJANGO =
+            1.9: django19
+            1.10: django110
+
+    If the current environment defines DJANGO as '1.9', then getting the
+    DJANGO envvar would return the 'django19' factor,
+
+    """
+    env_factors = travis_section.get(envvar, '')
+    env_factors = [v.split(':') for v in env_factors.splitlines()]
+    env_factors = dict(
+        (env_value.strip(), factor.strip())
+        for env_value, factor in env_factors
+    )
+    return env_factors.get(os.environ.get(envvar))
 
 
 def match_envs(declared_envs, desired_envs):
