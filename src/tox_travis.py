@@ -136,13 +136,31 @@ def get_env_factor(travis_section, envvar):
     DJANGO envvar would return the 'django19' factor,
 
     """
-    env_factors = travis_section.get(envvar, '')
-    env_factors = [v.split(':') for v in env_factors.splitlines()]
-    env_factors = dict(
-        (env_value.strip(), factor.strip())
-        for env_value, factor in env_factors
-    )
+    env_factors = parse_dict(travis_section.get(envvar, ''))
     return env_factors.get(os.environ.get(envvar))
+
+
+def parse_dict(value):
+    """Parse a dict value from the tox config. Values support comma
+    separation and brace expansion. ex:
+
+        python =
+            2.7: py27, docs
+            3: py{35,36}
+
+        >>> parse_dict("2.7: py27, docs\n3: py{35,36}")
+        {'2.7': ['py27', 'docs'], '3': ['py35', 'py36']}
+
+    """
+    # key-value pairs are split by line, may contain extraneous whitespace
+    kv_pairs = [line.strip() for line in value.splitlines()]
+    kv_pairs = [kv.strip().split(':', 1) for kv in kv_pairs if kv]
+
+    # values may be comma-separated
+    return dict(
+        (key.strip(), split_env(value))
+        for key, value in kv_pairs
+    )
 
 
 def match_envs(declared_envs, desired_envs):
