@@ -101,44 +101,66 @@ def get_default_envlist(version):
     return guess_python_env()
 
 
-def get_desired_envs(config, version):
-    """Get the expanded list of desired envs."""
+def _legacy_get_desired_envs(config, version):
     travis_section = config.sections.get('tox:travis', {})
-    if 'TRAVIS_PYTHON_VERSION' in travis_section:
-        # Use the travis section and environment variables
-        # to determine the desired tox factors.
-        desired_factors = [
-            get_env_factor(travis_section, envvar)
-            for envvar in travis_section
-        ]
-
-        # filter empty factors and join
-        env = '-'.join(filter(None, desired_factors))
-        return [env]
-
     default_envlist = get_default_envlist(version)
     return split_env(travis_section.get(version, default_envlist))
 
 
-def get_env_factor(travis_section, envvar):
-    """Derive a tox factor from the tox:travis section using
-    the current environment variables. For example, given the
-    following tox:travis section:
+def get_desired_envs(config, version):
+    """Get the expanded list of desired envs."""
+    if 'tox:travis' in config.sections:
+        return _legacy_get_desired_envs(config, version)
 
-        [tox:travis]
-        TRAVIS_PYTHON_VERSION =
-            2.7: py27
-            3.5: py35
+    # Parse the travis section
+    travis_section = config.sections.get('travis', {})
+    default_envlist = get_default_envlist(version)
+    default_envlist = split_env(default_envlist)
 
+    # Get python version factors
+    python_factors = parse_dict(travis_section.get('python', ''))
+    python_factors = python_factors.get(version, '')
+    python_factors = split_env(python_factors)
+
+    # Get os version factors
+    os_factors = parse_dict(travis_section.get('os', ''))
+    os_factors = os_factors.get(os.environ.get('TRAVIS_OS_NAME'), '')
+    os_factors = split_env(os_factors)
+
+    # Combine python & os version factors
+    desired_factors = [
+        (python_factors + os_factors) or default_envlist
+    ]
+
+    # Parse the environment factors
+    env_section = config.sections.get('travis:env', {})
+
+    # Use the travis section and environment variables
+    # to determine the desired tox factors.
+    desired_factors += [
+        get_env_factors(env_section, envvar)
+        for envvar in env_section
+    ]
+
+    # filter empty factors and join
+    return reduce_factors(filter(None, desired_factors))
+
+
+def get_env_factors(env_section, envvar):
+    """Derive a list of tox factors from the travis:env section
+    using the current environment variables. For example, given
+    the following travis:env section:
+
+        [travis:env]
         DJANGO =
             1.9: django19
             1.10: django110
 
     If the current environment defines DJANGO as '1.9', then getting the
-    DJANGO envvar would return the 'django19' factor,
+    DJANGO envvar would return a ['django19'] factor list.
 
     """
-    env_factors = parse_dict(travis_section.get(envvar, ''))
+    env_factors = parse_dict(env_section.get(envvar, ''))
     return env_factors.get(os.environ.get(envvar))
 
 
