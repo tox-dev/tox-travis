@@ -1,4 +1,4 @@
-from tox_travis import parse_dict
+from tox_travis import parse_dict, reduce_factors
 
 
 class TestParseDict:
@@ -38,3 +38,32 @@ class TestParseDict:
         }
 
         assert parse_dict(value) == expected
+
+
+class TestReduceFactors:
+
+    def test_simple(self):
+        factors = [
+            ['py35'],
+            ['django110'],
+        ]
+        expected = [
+            'py35-django110',
+        ]
+
+        assert reduce_factors(factors) == expected
+
+    def test_multiple(self):
+        factors = [
+            ['py27', 'py35'],
+            ['django19'],
+            ['drf33', 'drf34'],
+        ]
+        expected = [
+            'py27-django19-drf33',
+            'py27-django19-drf34',
+            'py35-django19-drf33',
+            'py35-django19-drf34',
+        ]
+
+        assert reduce_factors(factors) == expected

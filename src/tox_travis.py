@@ -4,6 +4,8 @@ import re
 import py
 import tox
 
+from itertools import product
+
 from tox.config import _split_env as split_env
 try:
     from tox.config import default_factors
@@ -161,6 +163,18 @@ def parse_dict(value):
         (key.strip(), split_env(value))
         for key, value in kv_pairs
     )
+
+
+def reduce_factors(factors):
+    """Reduce sets of factors into a single list of envs.
+
+        >>> reduce_factors([['py27', 'py35'], ['django110']])
+        ['py27-django110', 'py35-django110']
+
+    """
+    envs = product(*factors)
+    envs = ['-'.join(env) for env in envs]
+    return envs
 
 
 def match_envs(declared_envs, desired_envs):
