@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from pytest import raises
+
 
 tox_ini = b"""
 [tox]
@@ -67,13 +69,29 @@ DJANGO =
     1.10: django110
 """
 
+tox_ini_legacy_warning = b"""
+[tox]
+envlist = py{27,35}-django{19,110}
+
+[tox:travis]
+3.4 = py34, extra
+
+[travis:env]
+DJANGO =
+    1.9: django19
+    1.10: django110
+"""
+
 
 class TestToxTravis:
     def tox_envs(self):
         """Find the envs that tox sees."""
-        output = subprocess.Popen(
-            ['tox', '-l'], stdout=subprocess.PIPE).communicate()[0]
-        return output.decode('utf-8').strip().split()
+        proc = subprocess.Popen(
+            ['tox', '-l'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+
+        assert proc.returncode == 0, stderr.decode('utf-8')
+        return stdout.decode('utf-8').strip().split()
 
     def configure(self, tmpdir, monkeypatch, tox_ini,
                   version=None, major=None, minor=None,
@@ -249,3 +267,12 @@ class TestToxTravis:
 
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5', env={'DJANGO': '1.10'})
         assert self.tox_envs() == ['py35-django110']
+
+    def test_legacy_warning(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_legacy_warning
+        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
+
+        with raises(AssertionError) as err:
+            self.tox_envs()
+
+        assert '[tox:travis] is a legacy section and should not be used with [travis:env]' in str(err.value)

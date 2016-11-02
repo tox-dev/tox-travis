@@ -13,6 +13,9 @@ except ImportError:
     default_factors = None
 
 
+LEGACY_WARN = "[tox:travis] is a legacy section and should not be used with [%s]."
+
+
 @tox.hookimpl
 def tox_addoption(parser):
     if 'TRAVIS' not in os.environ:
@@ -110,6 +113,9 @@ def _legacy_get_desired_envs(config, version):
 def get_desired_envs(config, version):
     """Get the expanded list of desired envs."""
     if 'tox:travis' in config.sections:
+        for section in config.sections:
+            assert not section.startswith('travis'), \
+                LEGACY_WARN % section
         return _legacy_get_desired_envs(config, version)
 
     # Parse the travis section
