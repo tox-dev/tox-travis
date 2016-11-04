@@ -1,10 +1,11 @@
+"""Make it easy to work with Tox and Travis."""
+from __future__ import print_function
+from itertools import product
 import os
 import sys
 import re
 import py
 import tox
-
-from itertools import product
 
 from tox.config import _split_env as split_env
 try:
@@ -13,24 +14,37 @@ except ImportError:
     default_factors = None
 
 
-LEGACY_WARN = "[tox:travis] is a legacy section and should not be used with [%s]."
+# Mapping Travis factors to the associated env variables
+TRAVIS_FACTORS = {
+    'os': 'TRAVIS_OS_NAME',
+    'language': 'TRAVIS_LANGUAGE',
+    'python': 'TRAVIS_PYTHON_VERSION',
+}
 
 
 @tox.hookimpl
 def tox_addoption(parser):
+    """Default TOXENV automatically based on thes Travis environment."""
     if 'TRAVIS' not in os.environ:
         return
+
+    if 'TOXENV' in os.environ:
+        return  # Skip any processing if already set
 
     config = py.iniconfig.IniConfig('tox.ini')
 
     # Find the envs that tox knows about
     declared_envs = get_declared_envs(config)
 
-    # Find the requested envs
-    version = os.environ.get('TRAVIS_PYTHON_VERSION')
-    desired_envs = get_desired_envs(config, version)
+    # Find all the envs for all the desired factors given
+    desired_factors = get_desired_factors(config)
 
-    matched = match_envs(declared_envs, desired_envs)
+    # Reduce desired factors
+    desired_envs = ['-'.join(env) for env in product(*desired_factors)]
+
+    # Find matching envs
+    matched = match_envs(declared_envs, desired_envs,
+                         passthru=len(desired_factors) == 1)
     os.environ.setdefault('TOXENV', ','.join(matched))
 
     # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
@@ -38,6 +52,7 @@ def tox_addoption(parser):
     # is in the PATH.
     # https://github.com/travis-ci/travis-ci/issues/6304
     # Force use of the virtualenv `python`.
+    version = os.environ.get('TRAVIS_PYTHON_VERSION')
     if version and default_factors and version.startswith('pypy3.3-5.2-'):
         default_factors['pypy3'] = 'python'
 
@@ -104,122 +119,89 @@ def get_default_envlist(version):
     return guess_python_env()
 
 
-def _legacy_get_desired_envs(config, version):
-    travis_section = config.sections.get('tox:travis', {})
-    default_envlist = get_default_envlist(version)
-    return split_env(travis_section.get(version, default_envlist))
-
-
-def get_desired_envs(config, version):
-    """Get the expanded list of desired envs."""
-    if 'tox:travis' in config.sections:
-        for section in config.sections:
-            assert not section.startswith('travis'), \
-                LEGACY_WARN % section
-        return _legacy_get_desired_envs(config, version)
-
-    # Parse the travis section
+def get_desired_factors(config):
+    """Get the list of desired envs per declared factor."""
     travis_section = config.sections.get('travis', {})
-    default_envlist = get_default_envlist(version)
-    default_envlist = split_env(default_envlist)
-
-    # Get python version factors
-    python_factors = parse_dict(travis_section.get('python', ''))
-    python_factors = python_factors.get(version, '')
-    python_factors = split_env(python_factors)
-
-    # Get os version factors
-    os_factors = parse_dict(travis_section.get('os', ''))
-    os_factors = os_factors.get(os.environ.get('TRAVIS_OS_NAME'), '')
-    os_factors = split_env(os_factors)
-
-    # Combine python & os version factors
-    desired_factors = [
-        (python_factors + os_factors) or default_envlist
+    found_factors = [
+        (factor, parse_dict(travis_section[factor]))
+        for factor in TRAVIS_FACTORS
+        if factor in travis_section
     ]
 
-    # Parse the environment factors
-    env_section = config.sections.get('travis:env', {})
+    if 'tox:travis' in config.sections:
+        print('The [tox:travis] section is deprecated in favor of'
+              ' the "python" key of the [travis] section.', file=sys.stderr)
+        found_factors.append(('python', config.sections['tox:travis']))
 
-    # Use the travis section and environment variables
-    # to determine the desired tox factors.
-    desired_factors += [
-        get_env_factors(env_section, envvar)
-        for envvar in env_section
+    # Inject any needed autoenv
+    version = os.environ.get('TRAVIS_PYTHON_VERSION')
+    if version:
+        default_envlist = get_default_envlist(version)
+        if not any(factor == 'python' for factor, _ in found_factors):
+            found_factors.insert(0, ('python', {version: default_envlist}))
+        python_factors = [(factor, mapping)
+                          for factor, mapping in found_factors
+                          if version and factor == 'python']
+        for _, mapping in python_factors:
+            mapping.setdefault(version, default_envlist)
+
+    # Convert known travis factors to env factors,
+    # and combine with declared env factors.
+    env_factors = [
+        (TRAVIS_FACTORS[factor], mapping)
+        for factor, mapping in found_factors
+    ] + [
+        (name, parse_dict(value))
+        for name, value in config.sections.get('travis:env', {}).items()
     ]
 
-    # filter empty factors and join
-    return reduce_factors(filter(None, desired_factors))
-
-
-def get_env_factors(env_section, envvar):
-    """Derive a list of tox factors from the travis:env section
-    using the current environment variables. For example, given
-    the following travis:env section:
-
-        [travis:env]
-        DJANGO =
-            1.9: django19
-            1.10: django110
-
-    If the current environment defines DJANGO as '1.9', then getting the
-    DJANGO envvar would return a ['django19'] factor list.
-
-    """
-    env_factors = parse_dict(env_section.get(envvar, ''))
-    return env_factors.get(os.environ.get(envvar))
+    return [
+        split_env(mapping[os.environ[name]])
+        for name, mapping in env_factors
+        if name in os.environ and os.environ[name] in mapping
+    ]
 
 
 def parse_dict(value):
-    """Parse a dict value from the tox config. Values support comma
-    separation and brace expansion. ex:
+    """Parse a dict value from the tox config.
 
+    .. code-block: ini
+
+        [travis]
         python =
             2.7: py27, docs
-            3: py{35,36}
+            3.5: py{35,36}
 
-        >>> parse_dict("2.7: py27, docs\n3: py{35,36}")
-        {'2.7': ['py27', 'docs'], '3': ['py35', 'py36']}
+    With this config, the value of ``python`` would be parsed
+    by this function, and would return::
 
-    """
-    # key-value pairs are split by line, may contain extraneous whitespace
-    kv_pairs = [line.strip() for line in value.splitlines()]
-    kv_pairs = [kv.strip().split(':', 1) for kv in kv_pairs if kv]
-
-    # values may be comma-separated
-    return dict(
-        (key.strip(), split_env(value))
-        for key, value in kv_pairs
-    )
-
-
-def reduce_factors(factors):
-    """Reduce sets of factors into a single list of envs.
-
-        >>> reduce_factors([['py27', 'py35'], ['django110']])
-        ['py27-django110', 'py35-django110']
+        {
+            '2.7': 'py27, docs',
+            '3.5': 'py{35,36}',
+        }
 
     """
-    envs = product(*factors)
-    envs = ['-'.join(env) for env in envs]
-    return envs
+    lines = [line.strip() for line in value.strip().splitlines()]
+    pairs = [line.split(':', 1) for line in lines if line]
+    return dict((k.strip(), v.strip()) for k, v in pairs)
 
 
-def match_envs(declared_envs, desired_envs):
+def match_envs(declared_envs, desired_envs, passthru):
     """Determine the envs that match the desired_envs.
 
-    Envs in the desired_envs that do not match any env in the
-    declared_envs are appended to the list of matches verbatim.
+    If ``passthru` is True, and none of the declared envs match the
+    desired envs, then the desired envs will be used verbatim.
+
+    :param declared_envs: The envs that are declared in the tox config.
+    :param desired_envs: The envs desired from the tox-travis config.
+    :param bool passthru: Whether to used the ``desired_envs`` as a
+                          fallback if no declared envs match.
     """
     matched = [
         declared for declared in declared_envs
         if any(env_matches(declared, desired) for desired in desired_envs)
     ]
-    unmatched = [
-        desired for desired in desired_envs
-        if not any(env_matches(declared, desired) for declared in declared_envs)
-    ]
-    return matched + unmatched
+    return desired_envs if not matched and passthru else matched
 
 
 def env_matches(declared, desired):
