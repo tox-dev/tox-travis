@@ -49,12 +49,13 @@ envlist = py{27,34}-django, other
 
 tox_ini_travis_factors = b"""
 [tox]
-envlist = py{27,35}, docs
+envlist = py{27,34,35}, docs
 
 [travis]
+language =
+    generic: py{27,35}, docs
 python =
     2.7: py27, docs
-
 os =
     osx: py{27,35}, docs
 """
@@ -86,21 +87,25 @@ DJANGO =
 class TestToxTravis:
     def tox_envs(self):
         """Find the envs that tox sees."""
+        returncode, stdout, stderr = self.tox_envs_raw()
+        assert returncode == 0, stderr
+        return [env for env in stdout.strip().split('\n')]
+
+    def tox_envs_raw(self):
+        """Return the raw output of finding what tox sees."""
         proc = subprocess.Popen(
             ['tox', '-l'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
-
-        assert proc.returncode == 0, stderr.decode('utf-8')
-        return stdout.decode('utf-8').strip().split()
+        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
 
     def configure(self, tmpdir, monkeypatch, tox_ini,
                   version=None, major=None, minor=None,
                   travis_version=None, travis_os=None,
-                  env=None):
+                  travis_language=None, env=None):
         os.chdir(str(tmpdir))
         tmpdir.join('tox.ini').write(tox_ini)
 
-        if version or travis_version or travis_os:
+        if version or travis_version or travis_os or travis_language:
             monkeypatch.setenv('TRAVIS', 'true')
 
         if version:
@@ -114,11 +119,16 @@ class TestToxTravis:
 
             monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', sys_version)
 
+        print('!!travis_version:', travis_version)
+
         if travis_version:
             monkeypatch.setenv('TRAVIS_PYTHON_VERSION', travis_version)
 
         if travis_os:
             monkeypatch.setenv('TRAVIS_OS_NAME', travis_os)
+
+        if travis_language:
+            monkeypatch.setenv('TRAVIS_LANGUAGE', travis_language)
 
         if isinstance(env, dict):
             for key, value in env.items():
@@ -131,13 +141,6 @@ class TestToxTravis:
             'pypy', 'pypy3', 'docs',
         ]
         assert self.tox_envs() == expected
-
-    def test_any_default(self, tmpdir, monkeypatch):
-        self.configure(tmpdir, monkeypatch, tox_ini)
-        monkeypatch.setenv('TRAVIS', 'true')
-        tox_envs = self.tox_envs()
-        assert len(tox_envs) == 1
-        assert tox_envs[0].startswith('py')
 
     def test_travis_default_26(self, tmpdir, monkeypatch):
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 6)
@@ -243,36 +246,58 @@ class TestToxTravis:
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4)
         assert self.tox_envs() == ['other']
 
-    def test_travis_factors(self, tmpdir, monkeypatch):
+    def test_travis_factors_py27(self, tmpdir, monkeypatch):
         tox_ini = tox_ini_travis_factors
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
         assert self.tox_envs() == ['py27', 'docs']
 
+    def test_travis_factors_py35(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_factors
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5')
         assert self.tox_envs() == ['py35']
 
+    def test_travis_factors_osx(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_factors
         self.configure(tmpdir, monkeypatch, tox_ini, travis_os='osx')
         assert self.tox_envs() == ['py27', 'py35', 'docs']
 
-        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7', travis_os='osx')
+    def test_travis_factors_py27_osx(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_factors
+        self.configure(
+            tmpdir, monkeypatch, tox_ini,
+            travis_version='2.7', travis_os='osx')
+        assert self.tox_envs() == ['py27', 'docs']
+
+    def test_travis_factors_language(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_factors
+        self.configure(
+            tmpdir, monkeypatch, tox_ini, travis_language='generic')
         assert self.tox_envs() == ['py27', 'py35', 'docs']
 
-    def test_travis_env(self, tmpdir, monkeypatch):
+    def test_travis_env_py27(self, tmpdir, monkeypatch):
         tox_ini = tox_ini_travis_env
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
         assert self.tox_envs() == ['py27-django19', 'py27-django110']
 
-        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7', env={'DJANGO': '1.9'})
+    def test_travis_env_py27_dj19(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_env
+        self.configure(
+            tmpdir, monkeypatch, tox_ini,
+            travis_version='2.7', env={'DJANGO': '1.9'})
         assert self.tox_envs() == ['py27-django19']
 
-        self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5', env={'DJANGO': '1.10'})
+    def test_travis_env_py35_dj110(self, tmpdir, monkeypatch):
+        tox_ini = tox_ini_travis_env
+        self.configure(
+            tmpdir, monkeypatch, tox_ini,
+            travis_version='3.5', env={'DJANGO': '1.10'})
         assert self.tox_envs() == ['py35-django110']
 
     def test_legacy_warning(self, tmpdir, monkeypatch):
         tox_ini = tox_ini_legacy_warning
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
 
-        with raises(AssertionError) as err:
-            self.tox_envs()
-
-        assert '[tox:travis] is a legacy section and should not be used with [travis:env]' in str(err.value)
+        _, _, stderr = self.tox_envs_raw()
+        assert (
+            'The [tox:travis] section is deprecated in favor of the '
+            '"python" key of the [travis] section.' in stderr)
