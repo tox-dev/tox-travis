@@ -1,3 +1,14 @@
+0.7 (TBD)
++++++++++
+
+* Deprecate the ``[tox:travis]`` section in favor of
+  the ``python`` key to the new ``[travis]`` section.
+* Allow specifying envs by other Travis factors.
+  Includes ``os``, ``language``, and ``python``.
+* Allow specifying envs for environment variables,
+  in a new ``[travis:env]`` section.
+* Special thanks to @rpkibly for driving this work (#34)
+
 0.6 (2016-10-13)
 ++++++++++++++++
 
