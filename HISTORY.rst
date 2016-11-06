@@ -8,6 +8,23 @@
 * Allow specifying envs for environment variables,
   in a new ``[travis:env]`` section.
 * Special thanks to @rpkibly for driving this work (#34)
+* Backward incompatible changes:
+
+  * If *any* declared tox envs match the envs matched from factors,
+    no additional envs will be included automatically.
+    For example, if ``envlist`` is ``docs``,
+    and the configuration for python 3.4 is ``py34, docs``,
+    it previously would have run both the declared ``docs`` env,
+    as well as the undeclared ``py34`` env,
+    while now it will only run the declared ``docs`` env.
+    This may result in *fewer* envs running than expected,
+    but in edge cases that were believed to be unlikely.
+  * Previously, if no Python version was given in the environment,
+    it would automatically choose an appropriate env
+    based on the Python version running.
+    Now if no Python version is given in the environment
+    no env is determined by default,
+    which may result in *more* envs running in a job than expected.
 
 0.6 (2016-10-13)
 ++++++++++++++++
