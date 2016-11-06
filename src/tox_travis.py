@@ -120,7 +120,36 @@ def get_default_envlist(version):
 
 
 def get_desired_factors(config):
-    """Get the list of desired envs per declared factor."""
+    """Get the list of desired envs per declared factor.
+
+    Look at all the accepted configuration locations, and give a list
+    of envlists, one for each Travis factor found.
+
+    Look in the ``[travis]`` section for the known Travis factors,
+    which are backed by environment variable checking behind the
+    scenes, but provide a cleaner interface.
+
+    Also look for the ``[tox:travis]`` section, which is deprecated,
+    and treat it as an additional ``python`` key from the ``[travis]``
+    section.
+
+    Finally, look for factors based directly on environment variables,
+    listed in the ``[travis:env]`` section. Configuration found in the
+    ``[travis]`` and ``[tox:travis]`` sections are converted to this
+    form under the hood, and are considered in the same way.
+
+    Special consideration is given to the ``python`` factor. If this
+    factor is set in the environment, then an appropriate configuration
+    will be provided automatically if no manual configuration is
+    provided.
+
+    To allow for the most flexible processing, the envlists provided
+    by each factor are not combined after they are selected, but
+    instead returned as a list of envlists, and expected to be
+    combined as and when appropriate by the caller. This allows for
+    special handling based on the number of factors that were found
+    to apply to this environment.
+    """
     # Find configuration based on known travis factors
     travis_section = config.sections.get('travis', {})
     found_factors = [
