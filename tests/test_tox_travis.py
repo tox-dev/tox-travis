@@ -96,7 +96,7 @@ class TestToxTravis:
         proc = subprocess.Popen(
             ['tox', '-l'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
-        return 0, stdout.decode('utf-8'), stderr.decode('utf-8')
+        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
 
     def configure(self, tmpdir, monkeypatch, tox_ini,
                   version=None, major=None, minor=None,
