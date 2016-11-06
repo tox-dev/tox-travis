@@ -121,6 +121,7 @@ def get_default_envlist(version):
 
 def get_desired_factors(config):
     """Get the list of desired envs per declared factor."""
+    # Find configuration based on known travis factors
     travis_section = config.sections.get('travis', {})
     found_factors = [
         (factor, parse_dict(travis_section[factor]))
@@ -128,6 +129,7 @@ def get_desired_factors(config):
         if factor in travis_section
     ]
 
+    # Backward compatibility with the old tox:travis section
     if 'tox:travis' in config.sections:
         print('The [tox:travis] section is deprecated in favor of'
               ' the "python" key of the [travis] section.', file=sys.stderr)
@@ -155,6 +157,7 @@ def get_desired_factors(config):
         for name, value in config.sections.get('travis:env', {}).items()
     ]
 
+    # Choose the correct envlists based on the factor values
     return [
         split_env(mapping[os.environ[name]])
         for name, mapping in env_factors
