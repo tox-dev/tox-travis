@@ -1,7 +1,7 @@
+"""Test the automatic toxenv feature of Tox-Travis."""
 import os
 import subprocess
-
-from pytest import raises
+from tox_travis.toxenv import parse_dict
 
 
 tox_ini = b"""
@@ -84,7 +84,52 @@ DJANGO =
 """
 
 
-class TestToxTravis:
+class TestParseDict:
+    """Test the parse_dict function."""
+
+    def test_simple(self):
+        """Ensure simple cases work as expected."""
+        value = """
+        1.9: django19
+        1.10: django110
+        """
+        expected = {
+            '1.9': 'django19',
+            '1.10': 'django110',
+        }
+
+        assert parse_dict(value) == expected
+
+    def test_comma_separated_list(self):
+        """Ensure comma-separated lists don't get split by this function."""
+        value = """
+        2.7: py27, docs
+        3.5: py35
+        """
+        expected = {
+            '2.7': 'py27, docs',
+            '3.5': 'py35',
+        }
+
+        assert parse_dict(value) == expected
+
+    def test_brace_no_expansion(self):
+        """Ensure braces don't get expanded by this function."""
+        value = """
+        2.7: py27, docs
+        3.5: py{35,36}
+        """
+        expected = {
+            '2.7': 'py27, docs',
+            '3.5': 'py{35,36}',
+        }
+
+        assert parse_dict(value) == expected
+
+
+class TestToxEnv:
+    """Test the logic to automatically configure TOXENV with Travis."""
+
     def tox_envs(self):
         """Find the envs that tox sees."""
         returncode, stdout, stderr = self.tox_envs_raw()
@@ -102,6 +147,7 @@ class TestToxTravis:
                   version=None, major=None, minor=None,
                   travis_version=None, travis_os=None,
                   travis_language=None, env=None):
+        """Configure the environment for running a test."""
         os.chdir(str(tmpdir))
         tmpdir.join('tox.ini').write(tox_ini)
 
@@ -119,8 +165,6 @@ class TestToxTravis:
 
             monkeypatch.setenv('__TOX_TRAVIS_SYS_VERSION', sys_version)
 
-        print('!!travis_version:', travis_version)
-
         if travis_version:
             monkeypatch.setenv('TRAVIS_PYTHON_VERSION', travis_version)
 
@@ -135,6 +179,7 @@ class TestToxTravis:
                 monkeypatch.setenv(key, value)
 
     def test_not_travis(self, tmpdir, monkeypatch):
+        """Test the results if it's not on a Travis worker."""
         self.configure(tmpdir, monkeypatch, tox_ini)
         expected = [
             'py26', 'py27', 'py32', 'py33', 'py34',
@@ -143,46 +188,57 @@ class TestToxTravis:
         assert self.tox_envs() == expected
 
     def test_travis_default_26(self, tmpdir, monkeypatch):
+        """Give the correct env for CPython 2.6."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 6)
         assert self.tox_envs() == ['py26']
 
     def test_travis_default_27(self, tmpdir, monkeypatch):
+        """Give the correct env for CPython 2.7."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         assert self.tox_envs() == ['py27']
 
     def test_travis_default_32(self, tmpdir, monkeypatch):
+        """Give the correct env for CPython 3.2."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 2)
         assert self.tox_envs() == ['py32']
 
     def test_travis_default_33(self, tmpdir, monkeypatch):
+        """Give the correct env for CPython 3.3."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 3)
         assert self.tox_envs() == ['py33']
 
     def test_travis_default_34(self, tmpdir, monkeypatch):
+        """Give the correct env for CPython 3.4."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4)
         assert self.tox_envs() == ['py34']
 
     def test_travis_default_pypy(self, tmpdir, monkeypatch):
+        """Give the correct env for PyPy for Python 2.7."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'PyPy', 2, 7)
         assert self.tox_envs() == ['pypy']
 
     def test_travis_default_pypy3(self, tmpdir, monkeypatch):
+        """Give the correct env for PyPy for Python 3.2."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'PyPy', 3, 2)
         assert self.tox_envs() == ['pypy3']
 
     def test_travis_python_version_py27(self, tmpdir, monkeypatch):
+        """Give the correct env when python version is given by Travis."""
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
         assert self.tox_envs() == ['py27']
 
     def test_travis_python_version_py35(self, tmpdir, monkeypatch):
+        """Give the correct env when python version is given by Travis."""
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5')
         assert self.tox_envs() == ['py35']
 
     def test_travis_python_version_pypy(self, tmpdir, monkeypatch):
+        """Give the correct env when python version is given by Travis."""
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='pypy')
         assert self.tox_envs() == ['pypy']
 
     def test_travis_python_version_pypy3(self, tmpdir, monkeypatch):
+        """Give the correct env when python version is given by Travis."""
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='pypy3')
         assert self.tox_envs() == ['pypy3']
 
@@ -206,62 +262,74 @@ class TestToxTravis:
         assert self.tox_envs() == ['py35']
 
     def test_travis_override(self, tmpdir, monkeypatch):
+        """Test when the setting is overridden for a particular Python."""
         tox_ini = tox_ini_override
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         assert self.tox_envs() == ['py27', 'docs']
 
     def test_respect_overridden_toxenv(self, tmpdir, monkeypatch):
+        """Ensure that TOXENV if given is not changed."""
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         monkeypatch.setenv('TOXENV', 'py32')
         assert self.tox_envs() == ['py32']
 
     def test_keep_if_no_match(self, tmpdir, monkeypatch):
+        """It should keep the desired env if no declared env matches."""
         tox_ini = tox_ini_factors
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         assert self.tox_envs() == ['py27']
 
     def test_default_tox_ini_overrides(self, tmpdir, monkeypatch):
+        """Keep the overridden envlist verbatim when no envlist is declared."""
         tox_ini = tox_ini_factors_override
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         assert self.tox_envs() == ['py27-django']
 
     def test_factors(self, tmpdir, monkeypatch):
+        """Test that it will match envs by factors."""
         tox_ini = tox_ini_factors
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4)
         assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django']
 
     def test_match_and_keep(self, tmpdir, monkeypatch):
+        """Match factors for envs declared outside of envlist."""
         tox_ini = tox_ini_factors_override_nonenvlist
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4)
         assert self.tox_envs() == ['py34', 'py34-docs', 'py34-django',
                                    'extra-coveralls', 'extra-flake8']
 
     def test_django_factors(self, tmpdir, monkeypatch):
+        """A non-default factor completely overrides the default factor."""
         tox_ini = tox_ini_django_factors
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         assert self.tox_envs() == ['py27-django', 'py34-django']
 
     def test_non_python_factor(self, tmpdir, monkeypatch):
+        """A non-default factor completely overrides the default factor."""
         tox_ini = tox_ini_django_factors
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4)
         assert self.tox_envs() == ['other']
 
     def test_travis_factors_py27(self, tmpdir, monkeypatch):
+        """Test python factor given in the new travis section."""
         tox_ini = tox_ini_travis_factors
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
         assert self.tox_envs() == ['py27', 'docs']
 
     def test_travis_factors_py35(self, tmpdir, monkeypatch):
+        """Test python factor given in the new travis section."""
         tox_ini = tox_ini_travis_factors
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='3.5')
         assert self.tox_envs() == ['py35']
 
     def test_travis_factors_osx(self, tmpdir, monkeypatch):
+        """Test os factor given in the new travis section."""
         tox_ini = tox_ini_travis_factors
         self.configure(tmpdir, monkeypatch, tox_ini, travis_os='osx')
         assert self.tox_envs() == ['py27', 'py35', 'docs']
 
     def test_travis_factors_py27_osx(self, tmpdir, monkeypatch):
+        """Test os and python factors given in the new travis section."""
         tox_ini = tox_ini_travis_factors
         self.configure(
             tmpdir, monkeypatch, tox_ini,
@@ -269,17 +337,20 @@ class TestToxTravis:
         assert self.tox_envs() == ['py27', 'docs']
 
     def test_travis_factors_language(self, tmpdir, monkeypatch):
+        """Test language factor given in the new travis section."""
         tox_ini = tox_ini_travis_factors
         self.configure(
             tmpdir, monkeypatch, tox_ini, travis_language='generic')
         assert self.tox_envs() == ['py27', 'py35', 'docs']
 
     def test_travis_env_py27(self, tmpdir, monkeypatch):
+        """Test that env factors are ignored if not fulfilled."""
         tox_ini = tox_ini_travis_env
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
         assert self.tox_envs() == ['py27-django19', 'py27-django110']
 
     def test_travis_env_py27_dj19(self, tmpdir, monkeypatch):
+        """Test that env factors are used if they match."""
         tox_ini = tox_ini_travis_env
         self.configure(
             tmpdir, monkeypatch, tox_ini,
@@ -287,6 +358,7 @@ class TestToxTravis:
         assert self.tox_envs() == ['py27-django19']
 
     def test_travis_env_py35_dj110(self, tmpdir, monkeypatch):
+        """Test that env factors are used if they match."""
         tox_ini = tox_ini_travis_env
         self.configure(
             tmpdir, monkeypatch, tox_ini,
@@ -294,6 +366,7 @@ class TestToxTravis:
         assert self.tox_envs() == ['py35-django110']
 
     def test_legacy_warning(self, tmpdir, monkeypatch):
+        """Using the legacy tox:travis section prints a warining on stderr."""
         tox_ini = tox_ini_legacy_warning
         self.configure(tmpdir, monkeypatch, tox_ini, travis_version='2.7')
 

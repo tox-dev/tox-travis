@@ -1,11 +1,10 @@
-"""Make it easy to work with Tox and Travis."""
+"""Default TOXENV based on the Travis environment."""
 from __future__ import print_function
 from itertools import product
 import os
 import sys
 import re
 import py
-import tox
 
 from tox.config import _split_env as split_env
 try:
@@ -22,9 +21,8 @@ TRAVIS_FACTORS = {
 }
 
 
-@tox.hookimpl
-def tox_addoption(parser):
-    """Default TOXENV automatically based on thes Travis environment."""
+def default_toxenv():
+    """Default TOXENV automatically based on the Travis environment."""
     if 'TRAVIS' not in os.environ:
         return
 

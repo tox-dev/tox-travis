@@ -1,6 +1,6 @@
 import sys
 
-from setuptools import setup, __version__ as setuptools_version
+from setuptools import setup, find_packages, __version__ as setuptools_version
 from pkg_resources import parse_version
 
 import pkg_resources
@@ -66,9 +66,9 @@ setup(
     license='MIT',
     version='0.6',
     package_dir={'': 'src'},
-    py_modules=['tox_travis'],
+    packages=find_packages('src'),
     entry_points={
-        'tox': ['travis = tox_travis'],
+        'tox': ['travis = tox_travis.hooks'],
     },
     install_requires=['tox>=2.0'],
     extras_require={
