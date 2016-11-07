@@ -11,6 +11,9 @@ python:
  - "pypy3"
  - "pypy3.3-5.2-alpha1"
  - "3.6-dev"
+env:
+  global:
+    - secure: "bGFjOxO+MSbk+iEd8ZS6toh0rzHU+MGEU8J7GUlx8k34h0paM/lzA27CG4KidI82zSBbGlwDD/GcjtRtyRkW7wg301hgUR/1+mRhszbXdFeWEwqlH/BauGXmF2EBcMrC1iiA6OP8qsDrCTM5U3d3IBgeJ8/bfAQ1SMFW2dgmjM8+kg4qokrEPiSzAowOiWImpvd6yLedCJyOSvQNu5AEOTUmaEbBOjUIdV6h9iRzwiIx1M/qgF/sUwoHNhXqtVfpOkkP46DYuUkdMsPIampEHQm94e1CuibO2mqcHYmGISLKHljBwdZu1XzKZeXM1tx325L3E6fGBYwh//vhIRI1EHc7BhqEl2NpZeoG/r+62txJovtrdYoJPMDFmgxGEOQpIph/KlU5T1mrZSWeYgeFsSVZCD/n7KO2rtgdOdoTRssoyiBmNWS9nF8EDD4gtFH0F+SIQlqL1TOUF9mTMJ4RNqXomGHjQEblm2EKMOAORkXBmwScOPzT26e/maOfclt0XIzQqRWjW5SbXmbIzsbjGyiSdPCja3Vo9xM3GAty/acsvPqEvsmxepDNf3l9MVc32KQwud6gC6Tm/DwnK772emJtBWUpyn9MLTOM+hCeYK/wDN9CRHLW38rrg2CeJtjIbPa0C+6PyO/8a2iEnqTM2lYvs59bpzuVHzzQGNkc9x8="
 
 before_install:
  # Show the current setuptools version
