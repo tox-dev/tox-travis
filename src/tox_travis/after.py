@@ -4,23 +4,42 @@ import os
 import sys
 import json
 import time
+import py
 
 try:
     import urllib.request as urllib2
 except ImportError:
     import urllib2  # Python 2
 
+from .utils import TRAVIS_FACTORS, parse_dict
+
+
+def travis_after_monkeypatch():
+    """Monkeypatch the Tox session to wait for jobs to finish."""
+    import tox.session
+    real_subcommand_test = tox.session.Session.subcommand_test
+
+    def subcommand_test(self):
+        retcode = real_subcommand_test(self)
+        if self.config.option.travis_after:
+            travis_after()
+        return retcode
+    tox.session.Session.subcommand_test = subcommand_test
+
 
 def travis_after():
     """Wait for all jobs to finish, then exit successfully."""
     if not os.environ.get('TRAVIS'):
         print('Not a Travis environment.', file=sys.stderr)
-        sys.exit(2)
+        sys.exit(31)
+
+    if not after_config_matches():
+        return  # This is not the one that needs to wait
 
     github_token = os.environ.get('GITHUB_TOKEN')
     if not github_token:
         print('No GitHub token given.', file=sys.stderr)
-        sys.exit(3)
+        sys.exit(32)
 
     api_url = os.environ.get('TRAVIS_API_URL', 'https://api.travis-ci.org')
     build_id = os.environ.get('TRAVIS_BUILD_ID')
@@ -31,11 +50,11 @@ def travis_after():
     except ValueError:
         print('Invalid polling interval given: {0}'.format(
             repr(os.environ.get('TRAVIS_POLLING_INTERVAL'))), file=sys.stderr)
-        sys.exit(4)
+        sys.exit(33)
 
     if not all([api_url, build_id, job_number]):
         print('Required Travis environment not given.', file=sys.stderr)
-        sys.exit(5)
+        sys.exit(34)
 
     # This may raise an Exception, and it should be printed
     job_statuses = get_job_statuses(
@@ -43,10 +62,33 @@ def travis_after():
 
     if not all(job_statuses):
         print('Some jobs were not successful.')
-        sys.exit(1)
+        sys.exit(35)
 
     print('All required jobs were successful.')
-    sys.exit(0)
+
+
+def after_config_matches():
+    """Determine if this job should wait for the others."""
+    config = py.iniconfig.IniConfig('tox.ini')
+    section = config.sections.get('travis:after', {})
+
+    if not section:
+        return False  # Never wait if it's not configured
+
+    # Translate travis requirements to env requirements
+    env_requirements = [
+        (TRAVIS_FACTORS[factor], value) for factor, value
+        in parse_dict(section.get('travis', '')).items()
+        if factor in TRAVIS_FACTORS
+    ] + [
+        (name, value) for name, value
+        in parse_dict(section.get('env', '')).items()
+    ]
+
+    return all([
+        os.environ.get(name) == value
+        for name, value in env_requirements
+    ])
 
 
 def get_job_statuses(github_token, api_url, build_id,

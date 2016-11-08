@@ -1,7 +1,7 @@
 """Tox hook implementations."""
 import tox
 from .toxenv import default_toxenv
-from .after import travis_after
+from .after import travis_after_monkeypatch
 
 
 @tox.hookimpl
@@ -18,4 +18,4 @@ def tox_addoption(parser):
 def tox_configure(config):
     """Check for the presence of the added options."""
     if config.option.travis_after:
-        travis_after()
+        travis_after_monkeypatch()

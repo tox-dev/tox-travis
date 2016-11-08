@@ -6,50 +6,60 @@ from tox_travis.after import travis_after
 class TestAfter:
     """Test the logic of waiting for other jobs to finish."""
 
-    def test_not_travis(self, capsys):
+    def test_not_travis(self, mocker, capsys):
         """Raise with the right message when not in Travis."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 2
+        assert excinfo.value.code == 31
         out, err = capsys.readouterr()
         assert 'Not a Travis environment.' in err
 
-    def test_no_github_token(self, monkeypatch, capsys):
+    def test_no_github_token(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no github token."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 3
+        assert excinfo.value.code == 32
         out, err = capsys.readouterr()
         assert 'No GitHub token given.' in err
 
-    def test_travis_environment_build_id(self, monkeypatch, capsys):
+    def test_travis_environment_build_id(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no build id."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 5
+        assert excinfo.value.code == 34
         out, err = capsys.readouterr()
         assert 'Required Travis environment not given.' in err
 
-    def test_travis_environment_job_number(self, monkeypatch, capsys):
+    def test_travis_environment_job_number(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no build id."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         monkeypatch.setenv('TRAVIS_BUILD_ID', '1234')
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 5
+        assert excinfo.value.code == 34
         out, err = capsys.readouterr()
         assert 'Required Travis environment not given.' in err
 
-    def test_travis_environment_api_url(self, monkeypatch, capsys):
+    def test_travis_environment_api_url(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no api url."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         monkeypatch.setenv('TRAVIS_BUILD_ID', '1234')
@@ -59,12 +69,14 @@ class TestAfter:
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 5
+        assert excinfo.value.code == 34
         out, err = capsys.readouterr()
         assert 'Required Travis environment not given.' in err
 
-    def test_travis_environment_polling_interval(self, monkeypatch, capsys):
+    def test_travis_env_polling_interval(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no polling interval."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         monkeypatch.setenv('TRAVIS_BUILD_ID', '1234')
@@ -74,12 +86,14 @@ class TestAfter:
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 4
+        assert excinfo.value.code == 33
         out, err = capsys.readouterr()
         assert "Invalid polling interval given: 'xbe'" in err
 
-    def test_travis_environment_passed(self, monkeypatch, capsys, mocker):
+    def test_travis_env_passed(self, mocker, monkeypatch, capsys):
         """Bahave when required environment is present and jobs pass."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         monkeypatch.setenv('TRAVIS_BUILD_ID', '141739801')
@@ -170,16 +184,14 @@ class TestAfter:
         get_json.responses = iter(responses)
 
         mocker.patch('tox_travis.after.get_json', side_effect=get_json)
-
-        with pytest.raises(SystemExit) as excinfo:
-            travis_after()
-
-        assert excinfo.value.code == 0
+        travis_after()
         out, err = capsys.readouterr()
         assert 'All required jobs were successful.' in out
 
-    def test_travis_environment_failed(self, monkeypatch, capsys, mocker):
+    def test_travis_env_failed(self, mocker, monkeypatch, capsys):
         """Bahave when required environment is present and a job failed."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         monkeypatch.setenv('TRAVIS_BUILD_ID', '141739330')
@@ -277,6 +289,6 @@ class TestAfter:
         with pytest.raises(SystemExit) as excinfo:
             travis_after()
 
-        assert excinfo.value.code == 1
+        assert excinfo.value.code == 35
         out, err = capsys.readouterr()
         assert 'Some jobs were not successful.' in out
