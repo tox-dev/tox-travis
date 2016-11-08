@@ -70,7 +70,8 @@ def get_job_statuses(github_token, api_url, build_id,
             break  # All the jobs have completed
 
         print('Waiting for jobs to complete: {job_numbers}'.format(
-            job_numbers=[job['number'] for job in jobs]))
+            job_numbers=[job['number'] for job in jobs
+                         if not job['finished_at']]))
         time.sleep(polling_interval)
 
     return [job['state'] == 'passed' for job in jobs]
