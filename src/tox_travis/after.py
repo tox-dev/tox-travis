@@ -21,8 +21,8 @@ def travis_after_monkeypatch():
 
     def subcommand_test(self):
         retcode = real_subcommand_test(self)
-        if self.config.option.travis_after:
-            travis_after()
+        if retcode == 0 and self.config.option.travis_after:
+            travis_after()  # No need to run if the tests failed anyway
         return retcode
     tox.session.Session.subcommand_test = subcommand_test
 
