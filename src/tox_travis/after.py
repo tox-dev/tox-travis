@@ -68,6 +68,9 @@ def get_job_statuses(github_token, api_url, build_id,
                 and not job['allow_failure']]  # Ignore allowed failures
         if all(job['finished_at'] for job in jobs):
             break  # All the jobs have completed
+        elif any(job['state'] != 'passed'
+                 for job in jobs if job['finished_at']):
+            break  # Some required job that finished did not pass
 
         print('Waiting for jobs to complete: {job_numbers}'.format(
             job_numbers=[job['number'] for job in jobs
