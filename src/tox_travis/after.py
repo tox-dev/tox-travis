@@ -6,6 +6,7 @@ import json
 import time
 import py
 
+from tox.config import _split_env as split_env
 try:
     import urllib.request as urllib2
 except ImportError:
@@ -74,6 +75,13 @@ def after_config_matches():
 
     if not section:
         return False  # Never wait if it's not configured
+
+    if 'toxenv' in section:
+        required = set(split_env(section['toxenv']))
+        # TOXENV should always be set if we've gotten this far
+        actual = set(split_env(os.environ['TOXENV']))
+        if required - actual:
+            return False
 
     # Translate travis requirements to env requirements
     env_requirements = [

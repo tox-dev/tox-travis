@@ -203,3 +203,22 @@ to ensure that this job is the very last one to complete,
 and will only be successful if all others are successful,
 so that you can be more confident
 that you are shipping a working release.
+
+The accepted configuration keys
+in the ``[travis:after]`` section are:
+
+* ``toxenv``. Match with the running toxenvs,
+  based on the ``TOXENV`` environment variable,
+  which is set automatically by Tox-Travis.
+  Expansion is allowed, and if set *all* environments listed
+  must be present in the ``TOXENV`` environment variable.
+* ``travis``. Match with known Travis factors,
+  as is done in the ``[travis]`` section.
+  For instance, specifying that we should wait
+  when python is version 2.7 would look like
+  ``travis = python: 2.7``.
+* ``env``. Match with environment variable factors,
+  as might be specified in the ``[travis:env]`` section.
+  For instance, if we want to match that ``DJANGO`` is ``1.9``,
+  then it would look like ``env = DJANGO: 1.9``.
+  The value must match exactly to succeed.
