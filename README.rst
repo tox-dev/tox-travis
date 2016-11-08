@@ -169,6 +169,23 @@ Then run ``tox`` in your test command like this::
 
    tox --travis-after
 
+There are three environment variables
+that can be used to configure this feature.
+
+* ``GITHUB_TOKEN``. This is *required*,
+  and should be encrypted in the ``.travis.yml``.
+  This is used as the authentication method
+  for the Travis CI API.
+* ``TRAVIS_POLLING_INTERVAL``.
+  How often, in seconds, we should check the API
+  to see if the rest of the jobs have completed.
+  Defaults to 5.
+* ``TRAVIS_API_URL``.
+  The base URL to the Travis API for this build.
+  This defaults to ``https://api.travis-ci.org``.
+  A common override will be to the commercial version,
+  at ``https://api.travis-ci.com``.
+
 If any configuration item does not match,
 or if no configuration is given,
 this will run exactly as it would normally.
