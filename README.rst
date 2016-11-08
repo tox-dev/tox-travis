@@ -138,3 +138,51 @@ which will each run jobs as specified by the factors given.
   ``py27-django18``, and ``py34-django18``,
   because the ``os`` factor is present,
   and limits it to just those envs.
+
+
+After All
+=========
+
+Inspired by `travis-after-all`_ and `travis_after_all`_,
+this feature allows a job to wait for other jobs to finish
+before it calls itself complete.
+
+.. _`travis-after-all`: https://github.com/alrra/travis-after-all
+.. _`travis_after_all`: https://github.com/dmakhno/travis_after_all
+
+Configure which job to wait on by adding
+the ``[travis:after]`` section to the ``tox.ini`` file.
+The ``travis`` key looks for values that would be keys
+in various items in the ``[travis]`` section,
+and the ``env`` key looks for values that would be keys
+in items in the ``[travis:env]`` section.
+
+For example:
+
+.. code-block:: ini
+
+    [travis:after]
+    travis = python: 3.5
+    env = DJANGO: 1.8
+
+Then run ``tox`` in your test command like this::
+
+   tox --travis-after
+
+If any configuration item does not match,
+or if no configuration is given,
+this will run exactly as it would normally.
+However, if the configuration matches the current job,
+then it will wait for all the other jobs to complete
+before it will be willing to return a success return code.
+
+If the tests fail, then it will not bother waiting,
+but will rather return immediately.
+If it determines that another required job has failed,
+it will return an error indicating that jobs failed.
+
+You can use this together with a deployment configuration
+to ensure that this job is the very last one to complete,
+and will only be successful if all others are successful,
+so that you can be more confident
+that you are shipping a working release.
