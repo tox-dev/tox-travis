@@ -89,7 +89,7 @@ For example, see the following ``.travis.yml`` and ``tox.ini``:
 .. code-block:: ini
 
     [tox]
-    envlist py{27,34}-django{17,18}, docs
+    envlist = py{27,34}-django{17,18}, docs
 
     [travis]
     os =
@@ -121,7 +121,7 @@ which will each run jobs as specified by the factors given.
 * os: linux (default), language: python, python: 2.7, env: DJANGO=1.8
 
   This will run the env ``py27-django18``,
-  because ``py34`` is the default.
+  because ``py27`` is the default.
   ``docs`` is not run,
   because Python 2.7 doesn't include ``docs``
   in the defaults that are not overridden.
