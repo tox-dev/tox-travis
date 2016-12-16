@@ -4,3 +4,4 @@ __pycache__/
 /.cache/
 /build/
 /dist/
+docs/_build/
