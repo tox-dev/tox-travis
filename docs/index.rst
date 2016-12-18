@@ -6,5 +6,12 @@
 Welcome to Tox Travis's documentation!
 ======================================
 
+Contents:
 
-.. include:: ../README.rst
+.. toctree::
+   :maxdepth: 2
+
+   readme
+   contributing
+   history
+   license
