@@ -23,7 +23,7 @@ Usage
 
 Configure the Python versions to test with in ``travis.yml``:
 
-.. code-block::
+.. code-block:: yaml
 
     sudo: false
     language: python
@@ -69,7 +69,7 @@ If you are using multiple Travis factors,
 then you can use those factors to decide what will run.
 For example, see the following ``.travis.yml`` and ``tox.ini``:
 
-.. code-block::
+.. code-block:: yaml
 
     sudo: false
     language: python
