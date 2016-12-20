@@ -1,3 +1,8 @@
+0.7.1 (2016-12-20)
+++++++++++++++++++
+
+* Fix the README markup to display properly on PyPI.
+
 0.7 (2016-12-20)
 +++++++++
 
