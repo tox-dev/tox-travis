@@ -1,4 +1,4 @@
-0.7 (TBD)
+0.7 (2016-12-20)
 +++++++++
 
 * Deprecate the ``[tox:travis]`` section in favor of
