@@ -186,6 +186,40 @@ Then run ``tox`` in your test command like this::
 
    tox --travis-after
 
+For example, consider this mocked up ``.travis.yml``,
+that corresponds to using the above ``travis:after`` section:
+
+.. code-block:: yaml
+
+    sudo: false
+    language: python
+    python:
+      - "2.6"
+      - "3.5"
+    env:
+      global:
+        - GITHUB_TOKEN='spamandeggs'  # Make sure this is encrypted!
+      matrix:
+        - DJANGO="1.7"
+        - DJANGO="1.8"
+    install: pip install tox-travis
+    script: tox --travis-after
+    deploy:
+      provider: pypi
+      user: spam
+      password: eggs  # Make sure to encrypt passwords!
+      on:
+        tags: true
+        python: 3.5
+        condition: DJANGO = "1.8"
+      distributions: sdist bdist_wheel
+
+This example deploys when the build is from a tag
+and the build is on Python 3.5
+and the build is using DJANGO="1.8".
+Together ``tox --travis-after`` and Tox's ``on`` conditions
+make sure that the deploy only happens after all tests pass.
+
 If any configuration item does not match,
 or if no configuration is given,
 this will run exactly as it would normally.
