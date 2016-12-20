@@ -15,6 +15,15 @@ except ImportError:
 from .utils import TRAVIS_FACTORS, parse_dict
 
 
+# Exit code constants. They are purposely undocumented.
+# Please do not depend on their values.
+UNKNOWN_ENVIRONMENT = 31
+NO_GITHUB_TOKEN = 32
+INVALID_POLLING_INTERVAL = 33
+INCOMPLETE_TRAVIS_ENVIRONMENT = 34
+JOBS_FAILED = 35
+
+
 def travis_after_monkeypatch():
     """Monkeypatch the Tox session to wait for jobs to finish."""
     import tox.session
@@ -32,7 +41,7 @@ def travis_after():
     """Wait for all jobs to finish, then exit successfully."""
     if not os.environ.get('TRAVIS'):
         print('Not a Travis environment.', file=sys.stderr)
-        sys.exit(31)
+        sys.exit(UNKNOWN_ENVIRONMENT)
 
     if not after_config_matches():
         return  # This is not the one that needs to wait
@@ -40,7 +49,7 @@ def travis_after():
     github_token = os.environ.get('GITHUB_TOKEN')
     if not github_token:
         print('No GitHub token given.', file=sys.stderr)
-        sys.exit(32)
+        sys.exit(NO_GITHUB_TOKEN)
 
     api_url = os.environ.get('TRAVIS_API_URL', 'https://api.travis-ci.org')
     build_id = os.environ.get('TRAVIS_BUILD_ID')
@@ -51,11 +60,11 @@ def travis_after():
     except ValueError:
         print('Invalid polling interval given: {0}'.format(
             repr(os.environ.get('TRAVIS_POLLING_INTERVAL'))), file=sys.stderr)
-        sys.exit(33)
+        sys.exit(INVALID_POLLING_INTERVAL)
 
     if not all([api_url, build_id, job_number]):
         print('Required Travis environment not given.', file=sys.stderr)
-        sys.exit(34)
+        sys.exit(INCOMPLETE_TRAVIS_ENVIRONMENT)
 
     # This may raise an Exception, and it should be printed
     job_statuses = get_job_statuses(
@@ -63,7 +72,7 @@ def travis_after():
 
     if not all(job_statuses):
         print('Some jobs were not successful.')
-        sys.exit(35)
+        sys.exit(JOBS_FAILED)
 
     print('All required jobs were successful.')
 
