@@ -1,11 +1,10 @@
-"""Make it easy to work with Tox and Travis."""
+"""Default TOXENV based on the Travis environment."""
 from __future__ import print_function
 from itertools import product
 import os
 import sys
 import re
 import py
-import tox
 
 from tox.config import _split_env as split_env
 try:
@@ -13,18 +12,11 @@ try:
 except ImportError:
     default_factors = None
 
-
-# Mapping Travis factors to the associated env variables
-TRAVIS_FACTORS = {
-    'os': 'TRAVIS_OS_NAME',
-    'language': 'TRAVIS_LANGUAGE',
-    'python': 'TRAVIS_PYTHON_VERSION',
-}
+from .utils import TRAVIS_FACTORS, parse_dict
 
 
-@tox.hookimpl
-def tox_addoption(parser):
-    """Default TOXENV automatically based on thes Travis environment."""
+def default_toxenv():
+    """Default TOXENV automatically based on the Travis environment."""
     if 'TRAVIS' not in os.environ:
         return
 
@@ -192,30 +184,6 @@ def get_desired_factors(config):
         for name, mapping in env_factors
         if name in os.environ and os.environ[name] in mapping
     ]
-
-
-def parse_dict(value):
-    """Parse a dict value from the tox config.
-
-    .. code-block: ini
-
-        [travis]
-        python =
-            2.7: py27, docs
-            3.5: py{35,36}
-
-    With this config, the value of ``python`` would be parsed
-    by this function, and would return::
-
-        {
-            '2.7': 'py27, docs',
-            '3.5': 'py{35,36}',
-        }
-
-    """
-    lines = [line.strip() for line in value.strip().splitlines()]
-    pairs = [line.split(':', 1) for line in lines if line]
-    return dict((k.strip(), v.strip()) for k, v in pairs)
 
 
 def match_envs(declared_envs, desired_envs, passthru):

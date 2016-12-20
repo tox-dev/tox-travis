@@ -26,6 +26,10 @@
     no env is determined by default,
     which may result in *more* envs running in a job than expected.
 
+* Add the ``--travis-after`` command to enable
+  a job to wait until all others have completed. (#13)
+  - thanks to @ssbarnea for the feature suggestion.
+
 0.6 (2016-10-13)
 ++++++++++++++++
 
