@@ -47,7 +47,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Tox Travis'
+project = 'Tox-Travis'
 copyright = '2016, Ryan Hiebert'
 author = 'Ryan Hiebert'
 
@@ -131,7 +131,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ToxTravis.tex', 'Tox Travis Documentation',
+    (master_doc, 'ToxTravis.tex', 'Tox-Travis Documentation',
      'Ryan Hiebert', 'manual'),
 ]
 
@@ -141,7 +141,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'toxtravis', 'Tox Travis Documentation',
+    (master_doc, 'toxtravis', 'Tox-Travis Documentation',
      [author], 1)
 ]
 
@@ -152,8 +152,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ToxTravis', 'Tox Travis Documentation',
-     author, 'ToxTravis', 'One line description of project.',
+    (master_doc, 'ToxTravis', 'Tox-Travis Documentation',
+     author, 'ToxTravis', 'Integrate Tox and Travis.',
      'Miscellaneous'),
 ]
 
