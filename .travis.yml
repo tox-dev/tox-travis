@@ -32,6 +32,11 @@ branches:
     - /^\d+(\.\d+)*$/
 matrix:
   fast_finish: true
+  include:
+  - python: 3.5
+    env: TOXENV=docs
+  - python: 3.5
+    env: TOXENV=desc
 
 deploy:
   provider: pypi
@@ -41,4 +46,5 @@ deploy:
   on:
     tags: true
     python: 3.5
+    condition: $TOXENV != docs && $TOXENV != desc
   distributions: sdist bdist_wheel
