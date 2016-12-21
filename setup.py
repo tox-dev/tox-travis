@@ -1,4 +1,5 @@
 import sys
+import io
 
 from setuptools import setup, find_packages, __version__ as setuptools_version
 from pkg_resources import parse_version
@@ -53,13 +54,10 @@ if pkg_resources:
         MarkerEvaluation.evaluate_marker = MarkerEvaluation._markerlib_evaluate
 
 
-def fread(fn):
-    return open(fn, 'rb').read().decode('utf-8')
-
 setup(
     name='tox-travis',
     description='Seamless integration of Tox into Travis CI',
-    long_description=fread('README.rst') + '\n\n' + fread('HISTORY.rst'),
+    long_description=io.open('README.rst', encoding='utf-8').read(),
     author='Ryan Hiebert',
     author_email='ryan@ryanhiebert.com',
     url='https://github.com/ryanhiebert/tox-travis',
