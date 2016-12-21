@@ -1,10 +1,15 @@
+0.7.2 (2016-12-20)
+++++++++++++++++++
+
+* Undo the README changes, and fix HISTORY markup for PyPI.
+
 0.7.1 (2016-12-20)
 ++++++++++++++++++
 
 * Fix the README markup to display properly on PyPI.
 
 0.7 (2016-12-20)
-+++++++++
+++++++++++++++++
 
 * Deprecate the ``[tox:travis]`` section in favor of
   the ``python`` key to the new ``[travis]`` section.
