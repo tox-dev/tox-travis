@@ -1,6 +1,6 @@
-=====================================
-Tox-Travis: Integrate Tox into Travis
-=====================================
+====================================
+Tox-Travis: Integrate Tox and Travis
+====================================
 
 .. image:: https://img.shields.io/pypi/v/tox-travis.svg
    :target: https://pypi.python.org/pypi/tox-travis
