@@ -211,7 +211,7 @@ that corresponds to using the above ``travis:after`` section:
       on:
         tags: true
         python: 3.5
-        condition: DJANGO = "1.8"
+        condition: $DJANGO = "1.8"
       distributions: sdist bdist_wheel
 
 This example deploys when the build is from a tag
