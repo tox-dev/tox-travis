@@ -6,6 +6,10 @@ tox-travis: Integrate Tox into Travis
     :target: https://pypi.python.org/pypi/tox-travis
     :alt: Latest Version
 
+.. image:: https://readthedocs.org/projects/tox-travis/badge/?version=stable
+    :target: http://tox-travis.readthedocs.io/en/stable/?badge=stable
+    :alt: Documentation Status
+
 .. image:: https://travis-ci.org/ryanhiebert/tox-travis.svg?branch=master
     :target: https://travis-ci.org/ryanhiebert/tox-travis
 
