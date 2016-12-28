@@ -69,9 +69,10 @@ For example, see the following ``.travis.yml`` and ``tox.ini``:
     env:
       - DJANGO="1.7"
       - DJANGO="1.8"
-    include:
-      - os: osx
-        language: generic
+    matrix:
+      include:
+        - os: osx
+          language: generic
     install: pip install tox-travis
     script: tox
 
