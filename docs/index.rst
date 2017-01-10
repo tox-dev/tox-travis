@@ -7,7 +7,7 @@ Topics
    :maxdepth: 1
 
    toxenv
-   obey_outcomes
+   unignore_outcomes
    after
    contributing
    history

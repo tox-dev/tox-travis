@@ -31,6 +31,6 @@ def tox_configure(config):
     # regardless of how `ignore_outcome` was configured.
     tox_config = py.iniconfig.IniConfig('tox.ini')
     travis_reader = tox.config.SectionReader("travis", tox_config)
-    if not travis_reader.getbool('obey_outcomes', True):
+    if travis_reader.getbool('unignore_outcomes', False):
         for env in config.envlist:
             config.envconfigs[env].ignore_outcome = False

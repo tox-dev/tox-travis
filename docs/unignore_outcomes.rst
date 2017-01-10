@@ -1,12 +1,12 @@
-=============
-Obey Outcomes
-=============
+=================
+Unignore Outcomes
+=================
 
 By default, when using ``ignore_outcome`` in your Tox configuration,
 any build errors will show as successful on Travis. This might not
 be desired, as you might want to control allowed failures inside your
-``.travis.yml``. To cater this need, you can set ``obey_outcomes`` to
-``False``. This will override ``ignore_outcome`` by setting it to
+``.travis.yml``. To cater this need, you can set ``unignore_outcomes``
+to ``True``. This will override ``ignore_outcome`` by setting it to
 ``False`` for all environments.
 
 
@@ -27,4 +27,4 @@ And in your ``tox.ini``:
 .. code-block:: ini
 
     [travis]
-    obey_outcomes = False
+    unignore_outcomes = True

@@ -92,14 +92,14 @@ envlist = py{27,34,35}
 ignore_outcome = True
 """
 
-tox_ini_ignore_outcome_obey_outcomes = tox_ini_ignore_outcome + b"""
+tox_ini_ignore_outcome_unignore_outcomes = tox_ini_ignore_outcome + b"""
 [travis]
-obey_outcomes = True
+unignore_outcomes = True
 """
 
-tox_ini_ignore_outcome_not_obey_outcomes = tox_ini_ignore_outcome + b"""
+tox_ini_ignore_outcome_not_unignore_outcomes = tox_ini_ignore_outcome + b"""
 [travis]
-obey_outcomes = False
+unignore_outcomes = False
 """
 
 
@@ -373,18 +373,18 @@ class TestToxEnv:
         config = self.tox_config()
         assert config["testenv:py34"]["ignore_outcome"] == "True"
 
-    def test_travis_ignore_outcome_obey_outcomes(self, tmpdir, monkeypatch):
-        """Test ignore_outcome setting obey_outcomes = True (default value)."""
-        tox_ini = tox_ini_ignore_outcome_obey_outcomes
-        self.configure(tmpdir, monkeypatch, tox_ini,
-                       travis_language='generic')
-        config = self.tox_config()
-        assert config["testenv:py34"]["ignore_outcome"] == "True"
-
-    def test_travis_ignore_outcome_not_obey_outcomes(self, tmpdir, monkeypatch):
-        """Test ignore_outcome setting obey_outcomes = False."""
-        tox_ini = tox_ini_ignore_outcome_not_obey_outcomes
+    def test_travis_ignore_outcome_unignore_outcomes(self, tmpdir, monkeypatch):
+        """Test ignore_outcome setting unignore_outcomes = False."""
+        tox_ini = tox_ini_ignore_outcome_unignore_outcomes
         self.configure(tmpdir, monkeypatch, tox_ini,
                        travis_language='generic')
         config = self.tox_config()
         assert config["testenv:py34"]["ignore_outcome"] == "False"
+
+    def test_travis_ignore_outcome_not_unignore_outcomes(self, tmpdir, monkeypatch):
+        """Test ignore_outcome setting unignore_outcomes = False (default value)."""
+        tox_ini = tox_ini_ignore_outcome_not_unignore_outcomes
+        self.configure(tmpdir, monkeypatch, tox_ini,
+                       travis_language='generic')
+        config = self.tox_config()
+        assert config["testenv:py34"]["ignore_outcome"] == "True"
