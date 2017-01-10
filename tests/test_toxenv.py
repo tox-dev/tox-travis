@@ -388,3 +388,10 @@ class TestToxEnv:
                        travis_language='generic')
         config = self.tox_config()
         assert config["testenv:py34"]["ignore_outcome"] == "True"
+
+    def test_local_ignore_outcome_unignore_outcomes(self, tmpdir, monkeypatch):
+        """Test ignore_outcome unchanged when testing locally."""
+        tox_ini = tox_ini_ignore_outcome_unignore_outcomes
+        self.configure(tmpdir, monkeypatch, tox_ini)
+        config = self.tox_config()
+        assert config["testenv:py34"]["ignore_outcome"] == "True"
