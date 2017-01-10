@@ -123,7 +123,7 @@ class TestToxEnv:
         """Returns the configuration per configuration as computed by tox."""
         returncode, stdout, stderr = self.tox_config_raw()
         assert returncode == 0, stderr
-        ini = "[global]\n" + re.sub(r'^\s+', '', stdout, flags=re.MULTILINE)
+        ini = "[global]\n" + re.sub(re.compile(r'^\s+', re.MULTILINE), '', stdout)
         return py.iniconfig.IniConfig('', data=ini)
 
     def tox_config_raw(self):
