@@ -7,6 +7,7 @@ Topics
    :maxdepth: 1
 
    toxenv
+   obey_outcomes
    after
    contributing
    history
