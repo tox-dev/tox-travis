@@ -17,9 +17,6 @@ from .utils import TRAVIS_FACTORS, parse_dict
 
 def default_toxenv():
     """Default TOXENV automatically based on the Travis environment."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 

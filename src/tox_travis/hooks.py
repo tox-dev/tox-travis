@@ -20,7 +20,6 @@ def tox_addoption(parser):
 @tox.hookimpl
 def tox_configure(config):
     """Check for the presence of the added options."""
-
     if 'TRAVIS' not in os.environ:
         return
 
