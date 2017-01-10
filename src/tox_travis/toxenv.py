@@ -5,6 +5,7 @@ import os
 import sys
 import re
 import py
+import tox.config
 
 from tox.config import _split_env as split_env
 try:
@@ -215,3 +216,15 @@ def env_matches(declared, desired):
     desired_factors = desired.split('-')
     declared_factors = declared.split('-')
     return all(factor in declared_factors for factor in desired_factors)
+
+
+def override_ignore_outcome(config):
+    """Override ignore_outcome if unignore_outcomes is set to True."""
+    if 'TRAVIS' not in os.environ:
+        return
+
+    tox_config = py.iniconfig.IniConfig('tox.ini')
+    travis_reader = tox.config.SectionReader("travis", tox_config)
+    if travis_reader.getbool('unignore_outcomes', False):
+        for env in config.envlist:
+            config.envconfigs[env].ignore_outcome = False

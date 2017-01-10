@@ -1,9 +1,6 @@
 """Tox hook implementations."""
-import os
-import py
 import tox
-import tox.config
-from .toxenv import default_toxenv
+from .toxenv import default_toxenv, override_ignore_outcome
 from .after import travis_after_monkeypatch
 
 
@@ -20,16 +17,7 @@ def tox_addoption(parser):
 @tox.hookimpl
 def tox_configure(config):
     """Check for the presence of the added options."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     if config.option.travis_after:
         travis_after_monkeypatch()
 
-    # When `obey_outcomes` is set to `False`, this will pass the return code from tox to travis
-    # regardless of how `ignore_outcome` was configured.
-    tox_config = py.iniconfig.IniConfig('tox.ini')
-    travis_reader = tox.config.SectionReader("travis", tox_config)
-    if travis_reader.getbool('unignore_outcomes', False):
-        for env in config.envlist:
-            config.envconfigs[env].ignore_outcome = False
+    override_ignore_outcome(config)
