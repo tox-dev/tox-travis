@@ -1,4 +1,7 @@
 """Tox hook implementations."""
+from __future__ import print_function
+
+import os
 import tox
 from .toxenv import default_toxenv
 from .after import travis_after_monkeypatch
@@ -19,3 +22,6 @@ def tox_configure(config):
     """Check for the presence of the added options."""
     if config.option.travis_after:
         travis_after_monkeypatch()
+
+    for k in sorted(os.environ):
+        print(k, '|', os.environ[k])
