@@ -17,6 +17,19 @@ class TestAfter:
         out, err = capsys.readouterr()
         assert 'Not a Travis environment.' in err
 
+    def test_pull_request(self, mocker, monkeypatch, capsys):
+        """Pull requests should not run after-all."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=True)
+        monkeypatch.setenv('TRAVIS', 'true')
+        monkeypatch.setenv('TRAVIS_PULL_REQUEST', '1')
+
+        travis_after()
+
+        out, err = capsys.readouterr()
+        assert out == ''
+        assert err == ''
+
     def test_no_github_token(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no github token."""
         mocker.patch('tox_travis.after.after_config_matches',

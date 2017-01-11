@@ -43,6 +43,10 @@ def travis_after():
         print('Not a Travis environment.', file=sys.stderr)
         sys.exit(UNKNOWN_ENVIRONMENT)
 
+    # after-all disabled for pull requests
+    if os.environ.get('TRAVIS_PULL_REQUEST', 'false') != 'false':
+        return
+
     if not after_config_matches():
         return  # This is not the one that needs to wait
 
