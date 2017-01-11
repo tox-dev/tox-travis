@@ -1,5 +1,7 @@
 """Test the automatic toxenv feature of Tox-Travis."""
 import os
+import py
+import re
 import subprocess
 
 
@@ -82,6 +84,24 @@ DJANGO =
     1.10: django110
 """
 
+tox_ini_ignore_outcome = b"""
+[tox]
+envlist = py{27,34,35}
+
+[testenv]
+ignore_outcome = True
+"""
+
+tox_ini_ignore_outcome_unignore_outcomes = tox_ini_ignore_outcome + b"""
+[travis]
+unignore_outcomes = True
+"""
+
+tox_ini_ignore_outcome_not_unignore_outcomes = tox_ini_ignore_outcome + b"""
+[travis]
+unignore_outcomes = False
+"""
+
 
 class TestToxEnv:
     """Test the logic to automatically configure TOXENV with Travis."""
@@ -96,6 +116,20 @@ class TestToxEnv:
         """Return the raw output of finding what tox sees."""
         proc = subprocess.Popen(
             ['tox', '-l'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
+
+    def tox_config(self):
+        """Returns the configuration per configuration as computed by tox."""
+        returncode, stdout, stderr = self.tox_config_raw()
+        assert returncode == 0, stderr
+        ini = "[global]\n" + re.sub(re.compile(r'^\s+', re.MULTILINE), '', stdout)
+        return py.iniconfig.IniConfig('', data=ini)
+
+    def tox_config_raw(self):
+        """Return the raw output of finding the complex tox env config."""
+        proc = subprocess.Popen(
+            ['tox', '--showconfig'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = proc.communicate()
         return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
 
@@ -330,3 +364,34 @@ class TestToxEnv:
         assert (
             'The [tox:travis] section is deprecated in favor of the '
             '"python" key of the [travis] section.' in stderr)
+
+    def test_travis_ignore_outcome(self, tmpdir, monkeypatch):
+        """Test ignore_outcome without setting obey_outcomes."""
+        tox_ini = tox_ini_ignore_outcome
+        self.configure(tmpdir, monkeypatch, tox_ini,
+                       travis_language='generic')
+        config = self.tox_config()
+        assert config["testenv:py34"]["ignore_outcome"] == "True"
+
+    def test_travis_ignore_outcome_unignore_outcomes(self, tmpdir, monkeypatch):
+        """Test ignore_outcome setting unignore_outcomes = False."""
+        tox_ini = tox_ini_ignore_outcome_unignore_outcomes
+        self.configure(tmpdir, monkeypatch, tox_ini,
+                       travis_language='generic')
+        config = self.tox_config()
+        assert config["testenv:py34"]["ignore_outcome"] == "False"
+
+    def test_travis_ignore_outcome_not_unignore_outcomes(self, tmpdir, monkeypatch):
+        """Test ignore_outcome setting unignore_outcomes = False (default value)."""
+        tox_ini = tox_ini_ignore_outcome_not_unignore_outcomes
+        self.configure(tmpdir, monkeypatch, tox_ini,
+                       travis_language='generic')
+        config = self.tox_config()
+        assert config["testenv:py34"]["ignore_outcome"] == "True"
+
+    def test_local_ignore_outcome_unignore_outcomes(self, tmpdir, monkeypatch):
+        """Test ignore_outcome unchanged when testing locally."""
+        tox_ini = tox_ini_ignore_outcome_unignore_outcomes
+        self.configure(tmpdir, monkeypatch, tox_ini)
+        config = self.tox_config()
+        assert config["testenv:py34"]["ignore_outcome"] == "True"

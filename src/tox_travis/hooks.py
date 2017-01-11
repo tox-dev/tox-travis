@@ -1,6 +1,6 @@
 """Tox hook implementations."""
 import tox
-from .toxenv import default_toxenv
+from .toxenv import default_toxenv, override_ignore_outcome
 from .after import travis_after_monkeypatch
 
 
@@ -19,3 +19,5 @@ def tox_configure(config):
     """Check for the presence of the added options."""
     if config.option.travis_after:
         travis_after_monkeypatch()
+
+    override_ignore_outcome(config)
