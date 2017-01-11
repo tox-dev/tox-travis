@@ -1,3 +1,13 @@
+0.8 (2017-01-11)
+++++++++++++++++
+
+* Add Python 3.6 support in trove classifiers.
+* Skip after waiting for pull requests (#46).
+  - thanks to @rpkilby for fixing this bug.
+* Add ``unignore_outcomes`` setting to allow reversing
+  Tox's ``ignore_outcomes`` setting on Travis (#48).
+  - thanks to @Bouke for the implementation.
+
 0.7.2 (2016-12-20)
 ++++++++++++++++++
 
