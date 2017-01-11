@@ -13,7 +13,8 @@ There are three environment variables
 that can be used to configure this feature.
 
 * ``GITHUB_TOKEN``. This is *required*,
-  and should be encrypted in the ``.travis.yml``.
+  and should be encrypted in the ``.travis.yml``,
+  or set securely in the repository settings.
   This is used as the authentication method
   for the Travis CI API.
 * ``TRAVIS_POLLING_INTERVAL``.
