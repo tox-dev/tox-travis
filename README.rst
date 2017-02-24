@@ -7,7 +7,7 @@ Tox-Travis: Integrate Tox and Travis
    :alt: Latest Version
 
 .. image:: https://readthedocs.org/projects/tox-travis/badge/?version=stable
-   :target: http://tox-travis.readthedocs.io/en/stable/?badge=stable
+   :target: https://tox-travis.readthedocs.io/en/stable/?badge=stable
    :alt: Documentation Status
 
 .. image:: https://travis-ci.org/ryanhiebert/tox-travis.svg?branch=master
