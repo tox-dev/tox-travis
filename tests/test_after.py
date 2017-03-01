@@ -11,7 +11,7 @@ class TestAfter:
         mocker.patch('tox_travis.after.after_config_matches',
                      return_value=True)
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 31
         out, err = capsys.readouterr()
@@ -24,7 +24,7 @@ class TestAfter:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('TRAVIS_PULL_REQUEST', '1')
 
-        travis_after()
+        travis_after(mocker.Mock())
 
         out, err = capsys.readouterr()
         assert out == ''
@@ -36,7 +36,7 @@ class TestAfter:
                      return_value=True)
         monkeypatch.setenv('TRAVIS', 'true')
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 32
         out, err = capsys.readouterr()
@@ -49,7 +49,7 @@ class TestAfter:
         monkeypatch.setenv('TRAVIS', 'true')
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 34
         out, err = capsys.readouterr()
@@ -63,7 +63,7 @@ class TestAfter:
         monkeypatch.setenv('GITHUB_TOKEN', 'spamandeggs')
         monkeypatch.setenv('TRAVIS_BUILD_ID', '1234')
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 34
         out, err = capsys.readouterr()
@@ -80,7 +80,7 @@ class TestAfter:
         # TRAVIS_API_URL is set to a reasonable default
         monkeypatch.setenv('TRAVIS_API_URL', '')
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 34
         out, err = capsys.readouterr()
@@ -97,7 +97,7 @@ class TestAfter:
         # TRAVIS_POLLING_INTERVAL is set to a reasonable default
         monkeypatch.setenv('TRAVIS_POLLING_INTERVAL', 'xbe')
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 33
         out, err = capsys.readouterr()
@@ -197,7 +197,7 @@ class TestAfter:
         get_json.responses = iter(responses)
 
         mocker.patch('tox_travis.after.get_json', side_effect=get_json)
-        travis_after()
+        travis_after(mocker.Mock())
         out, err = capsys.readouterr()
         assert 'All required jobs were successful.' in out
 
@@ -300,7 +300,7 @@ class TestAfter:
         mocker.patch('tox_travis.after.get_json', side_effect=get_json)
 
         with pytest.raises(SystemExit) as excinfo:
-            travis_after()
+            travis_after(mocker.Mock())
 
         assert excinfo.value.code == 35
         out, err = capsys.readouterr()
