@@ -17,12 +17,14 @@ tox_ini_override = tox_ini + b"""
 
 tox_ini_factors = b"""
 [tox]
-envlist = py34, py34-docs, py34-django, dontmatch-1
+envlist = py27, py34, py34-docs, py34-django, dontmatch-1
 """
 
 tox_ini_factors_override = tox_ini_factors + b"""
 [tox:travis]
 2.7 = py27-django
+
+[testenv:py27-django]
 """
 
 tox_ini_factors_override_nonenvlist = tox_ini_factors + b"""
