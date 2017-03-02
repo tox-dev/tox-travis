@@ -82,8 +82,7 @@ def travis_after(config):
 
 def after_config_matches(config):
     """Determine if this job should wait for the others."""
-    tox_ini = get_iniconfig(config)
-    section = tox_ini.sections.get('travis:after', {})
+    section = get_iniconfig(config).sections.get('travis:after', {})
 
     if not section:
         return False  # Never wait if it's not configured

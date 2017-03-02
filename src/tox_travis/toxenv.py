@@ -33,13 +33,13 @@ def default_toxenv(config):
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 
-    tox_ini = get_iniconfig(config)
+    iniconfig = get_iniconfig(config)
 
     # Find the envs that tox knows about
-    declared_envs = get_declared_envs(tox_ini)
+    declared_envs = get_declared_envs(iniconfig)
 
     # Find all the envs for all the desired factors given
-    desired_factors = get_desired_factors(tox_ini)
+    desired_factors = get_desired_factors(iniconfig)
 
     # Reduce desired factors
     desired_envs = ['-'.join(env) for env in product(*desired_factors)]
@@ -223,8 +223,7 @@ def override_ignore_outcome(config):
     if 'TRAVIS' not in os.environ:
         return
 
-    tox_ini = get_iniconfig(config)
-    travis_reader = SectionReader("travis", tox_ini)
+    travis_reader = SectionReader("travis", get_iniconfig(config))
     if travis_reader.getbool('unignore_outcomes', False):
         for env in config.envlist:
             config.envconfigs[env].ignore_outcome = False
