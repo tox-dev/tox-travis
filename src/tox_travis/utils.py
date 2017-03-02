@@ -30,3 +30,12 @@ def parse_dict(value):
     lines = [line.strip() for line in value.strip().splitlines()]
     pairs = [line.split(':', 1) for line in lines if line]
     return dict((k.strip(), v.strip()) for k, v in pairs)
+
+
+def get_iniconfig(config):
+    """Get the IniConfig from the Tox config.
+
+    The Tox config is it's own wrapper around ``IniConfig`` from
+    ``py``. Get the underlying ``IniConfig`` from the config.
+    """
+    return config._cfg

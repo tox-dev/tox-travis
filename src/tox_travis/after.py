@@ -4,7 +4,6 @@ import os
 import sys
 import json
 import time
-import py
 
 from tox.config import _split_env as split_env
 try:
@@ -12,7 +11,7 @@ try:
 except ImportError:
     import urllib2  # Python 2
 
-from .utils import TRAVIS_FACTORS, parse_dict
+from .utils import TRAVIS_FACTORS, parse_dict, get_iniconfig
 
 
 # Exit code constants. They are purposely undocumented.
@@ -24,7 +23,7 @@ INCOMPLETE_TRAVIS_ENVIRONMENT = 34
 JOBS_FAILED = 35
 
 
-def travis_after_monkeypatch():
+def travis_after_monkeypatch(config):
     """Monkeypatch the Tox session to wait for jobs to finish."""
     import tox.session
     real_subcommand_test = tox.session.Session.subcommand_test
@@ -32,12 +31,12 @@ def travis_after_monkeypatch():
     def subcommand_test(self):
         retcode = real_subcommand_test(self)
         if retcode == 0 and self.config.option.travis_after:
-            travis_after()  # No need to run if the tests failed anyway
+            travis_after(config)  # No need to run if the tests failed anyway
         return retcode
     tox.session.Session.subcommand_test = subcommand_test
 
 
-def travis_after():
+def travis_after(config):
     """Wait for all jobs to finish, then exit successfully."""
     if not os.environ.get('TRAVIS'):
         print('Not a Travis environment.', file=sys.stderr)
@@ -47,7 +46,7 @@ def travis_after():
     if os.environ.get('TRAVIS_PULL_REQUEST', 'false') != 'false':
         return
 
-    if not after_config_matches():
+    if not after_config_matches(config):
         return  # This is not the one that needs to wait
 
     github_token = os.environ.get('GITHUB_TOKEN')
@@ -81,10 +80,9 @@ def travis_after():
     print('All required jobs were successful.')
 
 
-def after_config_matches():
+def after_config_matches(config):
     """Determine if this job should wait for the others."""
-    config = py.iniconfig.IniConfig('tox.ini')
-    section = config.sections.get('travis:after', {})
+    section = get_iniconfig(config).sections.get('travis:after', {})
 
     if not section:
         return False  # Never wait if it's not configured

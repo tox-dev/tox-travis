@@ -1,6 +1,6 @@
 """Tox hook implementations."""
 import tox
-from .toxenv import default_toxenv, override_ignore_outcome
+from .toxenv import coerce_pypy_version, default_toxenv, override_ignore_outcome
 from .after import travis_after_monkeypatch
 
 
@@ -11,13 +11,14 @@ def tox_addoption(parser):
         '--travis-after', dest='travis_after', action='store_true',
         help='Exit successfully after all Travis jobs complete successfully.')
 
-    default_toxenv()
+    coerce_pypy_version()
 
 
 @tox.hookimpl
 def tox_configure(config):
     """Check for the presence of the added options."""
     if config.option.travis_after:
-        travis_after_monkeypatch()
+        travis_after_monkeypatch(config)
 
     override_ignore_outcome(config)
+    default_toxenv(config)

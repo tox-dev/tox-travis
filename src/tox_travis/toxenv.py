@@ -4,42 +4,17 @@ from itertools import product
 import os
 import sys
 import re
-import py
-import tox.config
 
-from tox.config import _split_env as split_env
+from tox.config import _split_env as split_env, SectionReader
 try:
     from tox.config import default_factors
 except ImportError:
     default_factors = None
 
-from .utils import TRAVIS_FACTORS, parse_dict
+from .utils import TRAVIS_FACTORS, parse_dict, get_iniconfig
 
 
-def default_toxenv():
-    """Default TOXENV automatically based on the Travis environment."""
-    if 'TRAVIS' not in os.environ:
-        return
-
-    if 'TOXENV' in os.environ:
-        return  # Skip any processing if already set
-
-    config = py.iniconfig.IniConfig('tox.ini')
-
-    # Find the envs that tox knows about
-    declared_envs = get_declared_envs(config)
-
-    # Find all the envs for all the desired factors given
-    desired_factors = get_desired_factors(config)
-
-    # Reduce desired factors
-    desired_envs = ['-'.join(env) for env in product(*desired_factors)]
-
-    # Find matching envs
-    matched = match_envs(declared_envs, desired_envs,
-                         passthru=len(desired_factors) == 1)
-    os.environ.setdefault('TOXENV', ','.join(matched))
-
+def coerce_pypy_version():
     # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
     # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
     # is in the PATH.
@@ -48,6 +23,31 @@ def default_toxenv():
     version = os.environ.get('TRAVIS_PYTHON_VERSION')
     if version and default_factors and version.startswith('pypy3.3-5.2-'):
         default_factors['pypy3'] = 'python'
+
+
+def default_toxenv(config):
+    """Default TOXENV automatically based on the Travis environment."""
+    if 'TRAVIS' not in os.environ:
+        return
+
+    if 'TOXENV' in os.environ:
+        return  # Skip any processing if already set
+
+    iniconfig = get_iniconfig(config)
+
+    # Find the envs that tox knows about
+    declared_envs = get_declared_envs(iniconfig)
+
+    # Find all the envs for all the desired factors given
+    desired_factors = get_desired_factors(iniconfig)
+
+    # Reduce desired factors
+    desired_envs = ['-'.join(env) for env in product(*desired_factors)]
+
+    # Find matching envs
+    matched = match_envs(declared_envs, desired_envs,
+                         passthru=len(desired_factors) == 1)
+    config.envlist = matched
 
 
 def get_declared_envs(config):
@@ -223,8 +223,7 @@ def override_ignore_outcome(config):
     if 'TRAVIS' not in os.environ:
         return
 
-    tox_config = py.iniconfig.IniConfig('tox.ini')
-    travis_reader = tox.config.SectionReader("travis", tox_config)
+    travis_reader = SectionReader("travis", get_iniconfig(config))
     if travis_reader.getbool('unignore_outcomes', False):
         for env in config.envlist:
             config.envconfigs[env].ignore_outcome = False

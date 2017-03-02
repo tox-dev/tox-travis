@@ -7,7 +7,7 @@ import subprocess
 
 tox_ini = b"""
 [tox]
-envlist = py26, py27, py32, py33, py34, pypy, pypy3, docs
+envlist = py26, py27, py32, py33, py34, py35, pypy, pypy3, docs
 """
 
 tox_ini_override = tox_ini + b"""
@@ -17,12 +17,14 @@ tox_ini_override = tox_ini + b"""
 
 tox_ini_factors = b"""
 [tox]
-envlist = py34, py34-docs, py34-django, dontmatch-1
+envlist = py27, py34, py34-docs, py34-django, dontmatch-1
 """
 
 tox_ini_factors_override = tox_ini_factors + b"""
 [tox:travis]
 2.7 = py27-django
+
+[testenv:py27-django]
 """
 
 tox_ini_factors_override_nonenvlist = tox_ini_factors + b"""
@@ -103,13 +105,21 @@ unignore_outcomes = False
 """
 
 
+ERROR_FMT = """Tox process error
+stdout:
+%s
+stderr:
+%s
+"""
+
+
 class TestToxEnv:
     """Test the logic to automatically configure TOXENV with Travis."""
 
     def tox_envs(self):
         """Find the envs that tox sees."""
         returncode, stdout, stderr = self.tox_envs_raw()
-        assert returncode == 0, stderr
+        assert returncode == 0, ERROR_FMT % (stdout, stderr)
         return [env for env in stdout.strip().split('\n')]
 
     def tox_envs_raw(self):
@@ -172,7 +182,7 @@ class TestToxEnv:
         """Test the results if it's not on a Travis worker."""
         self.configure(tmpdir, monkeypatch, tox_ini)
         expected = [
-            'py26', 'py27', 'py32', 'py33', 'py34',
+            'py26', 'py27', 'py32', 'py33', 'py34', 'py35',
             'pypy', 'pypy3', 'docs',
         ]
         assert self.tox_envs() == expected
