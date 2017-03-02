@@ -15,11 +15,8 @@ def tox_addoption(parser):
 @tox.hookimpl
 def tox_configure(config):
     """Check for the presence of the added options."""
-    cfg = config._cfg
-
     if config.option.travis_after:
-        travis_after_monkeypatch(cfg)
+        travis_after_monkeypatch(config)
 
-    override_ignore_outcome(config, cfg)
-
-    default_toxenv(cfg)
+    override_ignore_outcome(config)
+    default_toxenv(config)

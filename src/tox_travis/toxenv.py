@@ -11,10 +11,10 @@ try:
 except ImportError:
     default_factors = None
 
-from .utils import TRAVIS_FACTORS, parse_dict
+from .utils import TRAVIS_FACTORS, parse_dict, get_iniconfig
 
 
-def default_toxenv(cfg):
+def default_toxenv(config):
     """Default TOXENV automatically based on the Travis environment."""
     if 'TRAVIS' not in os.environ:
         return
@@ -22,11 +22,13 @@ def default_toxenv(cfg):
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 
+    tox_ini = get_iniconfig(config)
+
     # Find the envs that tox knows about
-    declared_envs = get_declared_envs(cfg)
+    declared_envs = get_declared_envs(tox_ini)
 
     # Find all the envs for all the desired factors given
-    desired_factors = get_desired_factors(cfg)
+    desired_factors = get_desired_factors(tox_ini)
 
     # Reduce desired factors
     desired_envs = ['-'.join(env) for env in product(*desired_factors)]
@@ -34,7 +36,7 @@ def default_toxenv(cfg):
     # Find matching envs
     matched = match_envs(declared_envs, desired_envs,
                          passthru=len(desired_factors) == 1)
-    os.environ.setdefault('TOXENV', ','.join(matched))
+    config.envlist = matched
 
     # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
     # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
@@ -214,12 +216,13 @@ def env_matches(declared, desired):
     return all(factor in declared_factors for factor in desired_factors)
 
 
-def override_ignore_outcome(config, cfg):
+def override_ignore_outcome(config):
     """Override ignore_outcome if unignore_outcomes is set to True."""
     if 'TRAVIS' not in os.environ:
         return
 
-    travis_reader = SectionReader("travis", cfg)
+    tox_ini = get_iniconfig(config)
+    travis_reader = SectionReader("travis", tox_ini)
     if travis_reader.getbool('unignore_outcomes', False):
         for env in config.envlist:
             config.envconfigs[env].ignore_outcome = False
