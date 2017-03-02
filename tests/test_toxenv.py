@@ -7,7 +7,7 @@ import subprocess
 
 tox_ini = b"""
 [tox]
-envlist = py26, py27, py32, py33, py34, pypy, pypy3, docs
+envlist = py26, py27, py32, py33, py34, py35, pypy, pypy3, docs
 """
 
 tox_ini_override = tox_ini + b"""
@@ -180,7 +180,7 @@ class TestToxEnv:
         """Test the results if it's not on a Travis worker."""
         self.configure(tmpdir, monkeypatch, tox_ini)
         expected = [
-            'py26', 'py27', 'py32', 'py33', 'py34',
+            'py26', 'py27', 'py32', 'py33', 'py34', 'py35',
             'pypy', 'pypy3', 'docs',
         ]
         assert self.tox_envs() == expected
