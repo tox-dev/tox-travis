@@ -103,13 +103,21 @@ unignore_outcomes = False
 """
 
 
+ERROR_FMT = """Tox process error
+stdout:
+%s
+stderr:
+%s
+"""
+
+
 class TestToxEnv:
     """Test the logic to automatically configure TOXENV with Travis."""
 
     def tox_envs(self):
         """Find the envs that tox sees."""
         returncode, stdout, stderr = self.tox_envs_raw()
-        assert returncode == 0, stderr
+        assert returncode == 0, ERROR_FMT % (stdout, stderr)
         return [env for env in stdout.strip().split('\n')]
 
     def tox_envs_raw(self):
