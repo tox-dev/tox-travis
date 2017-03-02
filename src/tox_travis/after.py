@@ -23,7 +23,7 @@ INCOMPLETE_TRAVIS_ENVIRONMENT = 34
 JOBS_FAILED = 35
 
 
-def travis_after_monkeypatch(cfg):
+def travis_after_monkeypatch(config):
     """Monkeypatch the Tox session to wait for jobs to finish."""
     import tox.session
     real_subcommand_test = tox.session.Session.subcommand_test
@@ -31,12 +31,12 @@ def travis_after_monkeypatch(cfg):
     def subcommand_test(self):
         retcode = real_subcommand_test(self)
         if retcode == 0 and self.config.option.travis_after:
-            travis_after(cfg)  # No need to run if the tests failed anyway
+            travis_after(config)  # No need to run if the tests failed anyway
         return retcode
     tox.session.Session.subcommand_test = subcommand_test
 
 
-def travis_after(cfg):
+def travis_after(config):
     """Wait for all jobs to finish, then exit successfully."""
     if not os.environ.get('TRAVIS'):
         print('Not a Travis environment.', file=sys.stderr)
@@ -46,7 +46,7 @@ def travis_after(cfg):
     if os.environ.get('TRAVIS_PULL_REQUEST', 'false') != 'false':
         return
 
-    if not after_config_matches(cfg):
+    if not after_config_matches(config):
         return  # This is not the one that needs to wait
 
     github_token = os.environ.get('GITHUB_TOKEN')
@@ -80,9 +80,10 @@ def travis_after(cfg):
     print('All required jobs were successful.')
 
 
-def after_config_matches(cfg):
+def after_config_matches(config):
     """Determine if this job should wait for the others."""
-    section = cfg.sections.get('travis:after', {})
+    tox_ini = config._cfg
+    section = tox_ini.sections.get('travis:after', {})
 
     if not section:
         return False  # Never wait if it's not configured
