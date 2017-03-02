@@ -2,7 +2,6 @@
 import sys
 import os
 import py
-import tox.config
 
 # Mapping Travis factors to the associated env variables
 TRAVIS_FACTORS = {
@@ -79,8 +78,3 @@ def config_cfg(config):
     ``py``. Get the underlying ``IniConfig`` from the config.
     """
     return config._cfg
-
-
-def get_section(section, cfg):
-    """Get a section reader for the specified section."""
-    return tox.config.SectionReader(section, cfg)
