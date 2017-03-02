@@ -14,6 +14,17 @@ except ImportError:
 from .utils import TRAVIS_FACTORS, parse_dict, get_iniconfig
 
 
+def coerce_pypy_version():
+    # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
+    # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
+    # is in the PATH.
+    # https://github.com/travis-ci/travis-ci/issues/6304
+    # Force use of the virtualenv `python`.
+    version = os.environ.get('TRAVIS_PYTHON_VERSION')
+    if version and default_factors and version.startswith('pypy3.3-5.2-'):
+        default_factors['pypy3'] = 'python'
+
+
 def default_toxenv(config):
     """Default TOXENV automatically based on the Travis environment."""
     if 'TRAVIS' not in os.environ:
@@ -37,15 +48,6 @@ def default_toxenv(config):
     matched = match_envs(declared_envs, desired_envs,
                          passthru=len(desired_factors) == 1)
     config.envlist = matched
-
-    # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
-    # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
-    # is in the PATH.
-    # https://github.com/travis-ci/travis-ci/issues/6304
-    # Force use of the virtualenv `python`.
-    version = os.environ.get('TRAVIS_PYTHON_VERSION')
-    if version and default_factors and version.startswith('pypy3.3-5.2-'):
-        default_factors['pypy3'] = 'python'
 
 
 def get_declared_envs(config):
