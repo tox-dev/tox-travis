@@ -13,6 +13,9 @@ Tox-Travis: Integrate Tox and Travis
 .. image:: https://travis-ci.org/ryanhiebert/tox-travis.svg?branch=master
    :target: https://travis-ci.org/ryanhiebert/tox-travis
 
+.. image:: https://codecov.io/gh/ryanhiebert/tox-travis/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/ryanhiebert/tox-travis
+
 .. image:: https://badges.gitter.im/ryanhiebert/tox-travis.svg
    :alt: Join the chat at https://gitter.im/ryanhiebert/tox-travis
    :target: https://gitter.im/ryanhiebert/tox-travis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
