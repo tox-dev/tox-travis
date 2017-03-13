@@ -46,7 +46,7 @@ def default_toxenv():
     # https://github.com/travis-ci/travis-ci/issues/6304
     # Force use of the virtualenv `python`.
     version = os.environ.get('TRAVIS_PYTHON_VERSION')
-    if version and default_factors and version.startswith('pypy3.3-5.2-'):
+    if version and default_factors and re.match(r'pypy-3\.3-5\.\d-', version):
         default_factors['pypy3'] = 'python'
 
 
