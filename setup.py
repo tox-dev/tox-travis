@@ -30,7 +30,7 @@ class Python3MarkerDict(dict):
 
 if _markerlib and sys.version_info[0] == 3:
     env = _markerlib.markers._VARS
-    for key in list(env.keys()):
+    for key in list(env):
         new_key = key.replace('.', '_')
         if new_key != key:
             env[new_key] = env[key]
