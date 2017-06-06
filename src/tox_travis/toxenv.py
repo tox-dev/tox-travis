@@ -24,7 +24,8 @@ def default_toxenv():
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 
-    config = py.iniconfig.IniConfig('tox.ini')
+    config_path = os.environ.get('__TOX_TRAVIS_CONFIG_PATH', 'tox.ini')
+    config = py.iniconfig.IniConfig(config_path)
 
     # Find the envs that tox knows about
     declared_envs = get_declared_envs(config)
