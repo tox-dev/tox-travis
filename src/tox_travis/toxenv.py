@@ -15,13 +15,13 @@ def default_toxenv():
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 
-    config = py.iniconfig.IniConfig('tox.ini')
+    ini = py.iniconfig.IniConfig('tox.ini')
 
     # Find the envs that tox knows about
-    declared_envs = get_declared_envs(config)
+    declared_envs = get_declared_envs(ini)
 
     # Find all the envs for all the desired factors given
-    desired_factors = get_desired_factors(config)
+    desired_factors = get_desired_factors(ini)
 
     # Reduce desired factors
     desired_envs = ['-'.join(env) for env in product(*desired_factors)]
@@ -32,8 +32,8 @@ def default_toxenv():
     os.environ.setdefault('TOXENV', ','.join(matched))
 
 
-def get_declared_envs(config):
-    """Get the full list of envs from the tox config.
+def get_declared_envs(ini):
+    """Get the full list of envs from the tox ini.
 
     This notably also includes envs that aren't in the envlist,
     but are declared by having their own testenv:envname section.
@@ -41,12 +41,12 @@ def get_declared_envs(config):
     The envs are expected in a particular order. First the ones
     declared in the envlist, then the other testenvs in order.
     """
-    tox_section = config.sections.get('tox', {})
+    tox_section = ini.sections.get('tox', {})
     envlist = split_env(tox_section.get('envlist', []))
 
-    # Add additional envs that are declared as sections in the config
+    # Add additional envs that are declared as sections in the ini
     section_envs = [
-        section[8:] for section in sorted(config.sections, key=config.lineof)
+        section[8:] for section in sorted(ini.sections, key=ini.lineof)
         if section.startswith('testenv:')
     ]
 
@@ -94,7 +94,7 @@ def get_default_envlist(version):
     return guess_python_env()
 
 
-def get_desired_factors(config):
+def get_desired_factors(ini):
     """Get the list of desired envs per declared factor.
 
     Look at all the accepted configuration locations, and give a list
@@ -126,7 +126,7 @@ def get_desired_factors(config):
     to apply to this environment.
     """
     # Find configuration based on known travis factors
-    travis_section = config.sections.get('travis', {})
+    travis_section = ini.sections.get('travis', {})
     found_factors = [
         (factor, parse_dict(travis_section[factor]))
         for factor in TRAVIS_FACTORS
@@ -134,10 +134,10 @@ def get_desired_factors(config):
     ]
 
     # Backward compatibility with the old tox:travis section
-    if 'tox:travis' in config.sections:
+    if 'tox:travis' in ini.sections:
         print('The [tox:travis] section is deprecated in favor of'
               ' the "python" key of the [travis] section.', file=sys.stderr)
-        found_factors.append(('python', config.sections['tox:travis']))
+        found_factors.append(('python', ini.sections['tox:travis']))
 
     # Inject any needed autoenv
     version = os.environ.get('TRAVIS_PYTHON_VERSION')
@@ -158,7 +158,7 @@ def get_desired_factors(config):
         for factor, mapping in found_factors
     ] + [
         (name, parse_dict(value))
-        for name, value in config.sections.get('travis:env', {}).items()
+        for name, value in ini.sections.get('travis:env', {}).items()
     ]
 
     # Choose the correct envlists based on the factor values
