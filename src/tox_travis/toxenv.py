@@ -12,9 +12,6 @@ from .utils import TRAVIS_FACTORS, parse_dict
 
 def default_toxenv():
     """Default TOXENV automatically based on the Travis environment."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 
@@ -205,9 +202,6 @@ def env_matches(declared, desired):
 
 def override_ignore_outcome(config):
     """Override ignore_outcome if unignore_outcomes is set to True."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     tox_config = py.iniconfig.IniConfig('tox.ini')
     travis_reader = tox.config.SectionReader("travis", tox_config)
     if travis_reader.getbool('unignore_outcomes', False):

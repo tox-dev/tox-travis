@@ -8,9 +8,6 @@ except ImportError:
 
 def pypy_version_monkeypatch():
     """Patch Tox to work with non-default PyPy 3 versions."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
     # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
     # is in the PATH.

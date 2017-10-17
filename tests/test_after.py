@@ -6,17 +6,6 @@ from tox_travis.after import travis_after
 class TestAfter:
     """Test the logic of waiting for other jobs to finish."""
 
-    def test_not_travis(self, mocker, capsys):
-        """Raise with the right message when not in Travis."""
-        mocker.patch('tox_travis.after.after_config_matches',
-                     return_value=True)
-        with pytest.raises(SystemExit) as excinfo:
-            travis_after()
-
-        assert excinfo.value.code == 31
-        out, err = capsys.readouterr()
-        assert 'Not a Travis environment.' in err
-
     def test_pull_request(self, mocker, monkeypatch, capsys):
         """Pull requests should not run after-all."""
         mocker.patch('tox_travis.after.after_config_matches',
