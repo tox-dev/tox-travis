@@ -17,7 +17,6 @@ from .utils import TRAVIS_FACTORS, parse_dict
 
 # Exit code constants. They are purposely undocumented.
 # Please do not depend on their values.
-UNKNOWN_ENVIRONMENT = 31
 NO_GITHUB_TOKEN = 32
 INVALID_POLLING_INTERVAL = 33
 INCOMPLETE_TRAVIS_ENVIRONMENT = 34
@@ -39,10 +38,6 @@ def travis_after_monkeypatch():
 
 def travis_after():
     """Wait for all jobs to finish, then exit successfully."""
-    if not os.environ.get('TRAVIS'):
-        print('Not a Travis environment.', file=sys.stderr)
-        sys.exit(UNKNOWN_ENVIRONMENT)
-
     # after-all disabled for pull requests
     if os.environ.get('TRAVIS_PULL_REQUEST', 'false') != 'false':
         return

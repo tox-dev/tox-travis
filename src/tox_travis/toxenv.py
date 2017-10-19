@@ -6,21 +6,12 @@ import sys
 import re
 import py
 import tox.config
-
 from tox.config import _split_env as split_env
-try:
-    from tox.config import default_factors
-except ImportError:
-    default_factors = None
-
 from .utils import TRAVIS_FACTORS, parse_dict
 
 
 def default_toxenv():
     """Default TOXENV automatically based on the Travis environment."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     if 'TOXENV' in os.environ:
         return  # Skip any processing if already set
 
@@ -39,15 +30,6 @@ def default_toxenv():
     matched = match_envs(declared_envs, desired_envs,
                          passthru=len(desired_factors) == 1)
     os.environ.setdefault('TOXENV', ','.join(matched))
-
-    # Travis virtualenv do not provide `pypy3`, which tox tries to execute.
-    # This doesnt affect Travis python version `pypy3`, as the pyenv pypy3
-    # is in the PATH.
-    # https://github.com/travis-ci/travis-ci/issues/6304
-    # Force use of the virtualenv `python`.
-    version = os.environ.get('TRAVIS_PYTHON_VERSION')
-    if version and default_factors and version.startswith('pypy3.3-'):
-        default_factors['pypy3'] = 'python'
 
 
 def get_declared_envs(config):
@@ -220,9 +202,6 @@ def env_matches(declared, desired):
 
 def override_ignore_outcome(config):
     """Override ignore_outcome if unignore_outcomes is set to True."""
-    if 'TRAVIS' not in os.environ:
-        return
-
     tox_config = py.iniconfig.IniConfig('tox.ini')
     travis_reader = tox.config.SectionReader("travis", tox_config)
     if travis_reader.getbool('unignore_outcomes', False):
