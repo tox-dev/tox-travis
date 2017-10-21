@@ -10,9 +10,9 @@ from tox.config import _split_env as split_env
 from .utils import TRAVIS_FACTORS, parse_dict
 
 
-def default_toxenv():
-    """Default TOXENV automatically based on the Travis environment."""
-    if 'TOXENV' in os.environ:
+def default_toxenv(config):
+    """Default envlist automatically based on the Travis environment."""
+    if 'TOXENV' in os.environ or config.option.env:
         return  # Skip any processing if already set
 
     ini = py.iniconfig.IniConfig('tox.ini')
@@ -29,7 +29,40 @@ def default_toxenv():
     # Find matching envs
     matched = match_envs(declared_envs, desired_envs,
                          passthru=len(desired_factors) == 1)
-    os.environ.setdefault('TOXENV', ','.join(matched))
+
+    # Make the envconfig for undeclared matched envs
+    autogen_envconfigs(config, set(matched) - set(config.envconfigs))
+
+    config.envlist = matched
+
+
+def autogen_envconfigs(config, envs):
+    """Make the envconfigs for undeclared envs.
+
+    This is a stripped-down version of parseini.__init__ made for making
+    an envconfig.
+    """
+    prefix = 'tox' if config.toxinipath.basename == 'setup.cfg' else None
+    reader = tox.config.SectionReader("tox", config._cfg, prefix=prefix)
+    distshare_default = "{homedir}/.tox/distshare"
+    reader.addsubstitutions(toxinidir=config.toxinidir,
+                            homedir=config.homedir)
+
+    reader.addsubstitutions(toxworkdir=config.toxworkdir)
+    config.distdir = reader.getpath("distdir", "{toxworkdir}/dist")
+    reader.addsubstitutions(distdir=config.distdir)
+    config.distshare = reader.getpath("distshare", distshare_default)
+    reader.addsubstitutions(distshare=config.distshare)
+
+    # Create the undeclared envs
+    for env in envs:
+        make_envconfig = tox.config.parseini.make_envconfig
+        # Dig past the unbound method in Python 2
+        make_envconfig = getattr(make_envconfig, '__func__', make_envconfig)
+
+        section = tox.config.testenvprefix + env
+        config.envconfigs[env] = make_envconfig(
+            config, env, section, reader._subs, config)
 
 
 def get_declared_envs(ini):
@@ -205,5 +238,5 @@ def override_ignore_outcome(config):
     tox_config = py.iniconfig.IniConfig('tox.ini')
     travis_reader = tox.config.SectionReader("travis", tox_config)
     if travis_reader.getbool('unignore_outcomes', False):
-        for env in config.envlist:
-            config.envconfigs[env].ignore_outcome = False
+        for envconfig in config.envconfigs.values():
+            envconfig.ignore_outcome = False

@@ -17,7 +17,6 @@ def tox_addoption(parser):
         help='Exit successfully after all Travis jobs complete successfully.')
 
     if 'TRAVIS' in os.environ:
-        default_toxenv()
         pypy_version_monkeypatch()
 
 
@@ -27,4 +26,5 @@ def tox_configure(config):
     if 'TRAVIS' in os.environ:
         if config.option.travis_after:
             travis_after_monkeypatch()
+        default_toxenv(config)
         override_ignore_outcome(config)
