@@ -4,7 +4,6 @@ from itertools import product
 import os
 import sys
 import re
-import py
 import tox.config
 from tox.config import _split_env as split_env
 from .utils import TRAVIS_FACTORS, parse_dict
@@ -15,7 +14,7 @@ def default_toxenv(config):
     if 'TOXENV' in os.environ or config.option.env:
         return  # Skip any processing if already set
 
-    ini = py.iniconfig.IniConfig('tox.ini')
+    ini = config._cfg
 
     # Find the envs that tox knows about
     declared_envs = get_declared_envs(ini)
@@ -235,8 +234,7 @@ def env_matches(declared, desired):
 
 def override_ignore_outcome(config):
     """Override ignore_outcome if unignore_outcomes is set to True."""
-    tox_config = py.iniconfig.IniConfig('tox.ini')
-    travis_reader = tox.config.SectionReader("travis", tox_config)
+    travis_reader = tox.config.SectionReader("travis", config._cfg)
     if travis_reader.getbool('unignore_outcomes', False):
         for envconfig in config.envconfigs.values():
             envconfig.ignore_outcome = False
