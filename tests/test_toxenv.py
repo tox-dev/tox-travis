@@ -116,6 +116,13 @@ stderr:
 class TestToxEnv:
     """Test the logic to automatically configure TOXENV with Travis."""
 
+    def tox_command_raw(self, options):
+        """Return the raw output of finding what tox sees."""
+        proc = subprocess.Popen(
+            ['tox'] + options, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
+
     def tox_envs(self):
         """Find the envs that tox sees."""
         returncode, stdout, stderr = self.tox_envs_raw()
@@ -124,10 +131,7 @@ class TestToxEnv:
 
     def tox_envs_raw(self):
         """Return the raw output of finding what tox sees."""
-        proc = subprocess.Popen(
-            ['tox', '-l'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc.communicate()
-        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
+        return tox_command_raw(['-l'])
 
     def tox_config(self):
         """Returns the configuration per configuration as computed by tox."""
@@ -138,10 +142,7 @@ class TestToxEnv:
 
     def tox_config_raw(self):
         """Return the raw output of finding the complex tox env config."""
-        proc = subprocess.Popen(
-            ['tox', '--showconfig'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = proc.communicate()
-        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
+        return tox_command_raw(['--showconfig'])
 
     def configure(self, tmpdir, monkeypatch, tox_ini,
                   version=None, major=None, minor=None,
@@ -272,6 +273,10 @@ class TestToxEnv:
         self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
         monkeypatch.setenv('TOXENV', 'py32')
         assert self.tox_envs() == ['py32']
+
+    def test_respect_envlist_option(self, tmpdir, monkeypatch):
+        self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7)
+        assert self.tox_command_raw(['-e', 'py34']) == 'foo'
 
     def test_keep_if_no_match(self, tmpdir, monkeypatch):
         """It should keep the desired env if no declared env matches."""
