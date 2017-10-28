@@ -18,12 +18,17 @@ before_install:
  # Show the current setuptools version
  - python -c "import setuptools; print(setuptools.__version__)"
 install:
- - pip install wheel codecov coverage
+ - pip install wheel codecov
+ # Coverage doesn't work with Python 3.2 or PyPy
+ - test "$TRAVIS_PYTHON_VERSION" = "3.2" -o "`echo $TRAVIS_PYTHON_VERSION | head -c 4`" = "pypy" || pip install coverage_pth
  - python setup.py install bdist_wheel
  - pip install ./dist/tox_travis-*.whl
 script:
  - tox
  - tox --installpkg ./dist/tox_travis-*.whl --travis-after
+env:
+  global:
+    - COVERAGE_PROCESS_START=.coveragerc
 after_success: coverage combine && codecov
 
 branches:
