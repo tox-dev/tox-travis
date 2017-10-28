@@ -10,18 +10,18 @@ from tox.config import _split_env as split_env
 from .utils import TRAVIS_FACTORS, parse_dict
 
 
-def default_toxenv():
-    """Default TOXENV automatically based on the Travis environment."""
-    if 'TOXENV' in os.environ:
+def default_toxenv(config):
+    """Default envlist automatically based on the Travis environment."""
+    if 'TOXENV' in os.environ or config.option.env:
         return  # Skip any processing if already set
 
-    config = py.iniconfig.IniConfig('tox.ini')
+    ini = py.iniconfig.IniConfig('tox.ini')
 
     # Find the envs that tox knows about
-    declared_envs = get_declared_envs(config)
+    declared_envs = get_declared_envs(ini)
 
     # Find all the envs for all the desired factors given
-    desired_factors = get_desired_factors(config)
+    desired_factors = get_desired_factors(ini)
 
     # Reduce desired factors
     desired_envs = ['-'.join(env) for env in product(*desired_factors)]
@@ -29,11 +29,44 @@ def default_toxenv():
     # Find matching envs
     matched = match_envs(declared_envs, desired_envs,
                          passthru=len(desired_factors) == 1)
-    os.environ.setdefault('TOXENV', ','.join(matched))
+
+    # Make the envconfig for undeclared matched envs
+    autogen_envconfigs(config, set(matched) - set(config.envconfigs))
+
+    config.envlist = matched
 
 
-def get_declared_envs(config):
-    """Get the full list of envs from the tox config.
+def autogen_envconfigs(config, envs):
+    """Make the envconfigs for undeclared envs.
+
+    This is a stripped-down version of parseini.__init__ made for making
+    an envconfig.
+    """
+    prefix = 'tox' if config.toxinipath.basename == 'setup.cfg' else None
+    reader = tox.config.SectionReader("tox", config._cfg, prefix=prefix)
+    distshare_default = "{homedir}/.tox/distshare"
+    reader.addsubstitutions(toxinidir=config.toxinidir,
+                            homedir=config.homedir)
+
+    reader.addsubstitutions(toxworkdir=config.toxworkdir)
+    config.distdir = reader.getpath("distdir", "{toxworkdir}/dist")
+    reader.addsubstitutions(distdir=config.distdir)
+    config.distshare = reader.getpath("distshare", distshare_default)
+    reader.addsubstitutions(distshare=config.distshare)
+
+    # Create the undeclared envs
+    for env in envs:
+        make_envconfig = tox.config.parseini.make_envconfig
+        # Dig past the unbound method in Python 2
+        make_envconfig = getattr(make_envconfig, '__func__', make_envconfig)
+
+        section = tox.config.testenvprefix + env
+        config.envconfigs[env] = make_envconfig(
+            config, env, section, reader._subs, config)
+
+
+def get_declared_envs(ini):
+    """Get the full list of envs from the tox ini.
 
     This notably also includes envs that aren't in the envlist,
     but are declared by having their own testenv:envname section.
@@ -41,12 +74,12 @@ def get_declared_envs(config):
     The envs are expected in a particular order. First the ones
     declared in the envlist, then the other testenvs in order.
     """
-    tox_section = config.sections.get('tox', {})
+    tox_section = ini.sections.get('tox', {})
     envlist = split_env(tox_section.get('envlist', []))
 
-    # Add additional envs that are declared as sections in the config
+    # Add additional envs that are declared as sections in the ini
     section_envs = [
-        section[8:] for section in sorted(config.sections, key=config.lineof)
+        section[8:] for section in sorted(ini.sections, key=ini.lineof)
         if section.startswith('testenv:')
     ]
 
@@ -94,7 +127,7 @@ def get_default_envlist(version):
     return guess_python_env()
 
 
-def get_desired_factors(config):
+def get_desired_factors(ini):
     """Get the list of desired envs per declared factor.
 
     Look at all the accepted configuration locations, and give a list
@@ -126,7 +159,7 @@ def get_desired_factors(config):
     to apply to this environment.
     """
     # Find configuration based on known travis factors
-    travis_section = config.sections.get('travis', {})
+    travis_section = ini.sections.get('travis', {})
     found_factors = [
         (factor, parse_dict(travis_section[factor]))
         for factor in TRAVIS_FACTORS
@@ -134,10 +167,10 @@ def get_desired_factors(config):
     ]
 
     # Backward compatibility with the old tox:travis section
-    if 'tox:travis' in config.sections:
+    if 'tox:travis' in ini.sections:
         print('The [tox:travis] section is deprecated in favor of'
               ' the "python" key of the [travis] section.', file=sys.stderr)
-        found_factors.append(('python', config.sections['tox:travis']))
+        found_factors.append(('python', ini.sections['tox:travis']))
 
     # Inject any needed autoenv
     version = os.environ.get('TRAVIS_PYTHON_VERSION')
@@ -158,7 +191,7 @@ def get_desired_factors(config):
         for factor, mapping in found_factors
     ] + [
         (name, parse_dict(value))
-        for name, value in config.sections.get('travis:env', {}).items()
+        for name, value in ini.sections.get('travis:env', {}).items()
     ]
 
     # Choose the correct envlists based on the factor values
@@ -205,5 +238,5 @@ def override_ignore_outcome(config):
     tox_config = py.iniconfig.IniConfig('tox.ini')
     travis_reader = tox.config.SectionReader("travis", tox_config)
     if travis_reader.getbool('unignore_outcomes', False):
-        for env in config.envlist:
-            config.envconfigs[env].ignore_outcome = False
+        for envconfig in config.envconfigs.values():
+            envconfig.ignore_outcome = False

@@ -416,7 +416,7 @@ class TestToxEnv:
         """Test ignore_outcome without setting obey_outcomes."""
         tox_ini = tox_ini_ignore_outcome
         with self.configure(
-            tmpdir, monkeypatch, tox_ini, travis_language='generic'
+            tmpdir, monkeypatch, tox_ini, travis_version='3.4'
         ):
             config = self.tox_config()
             assert config["testenv:py34"]["ignore_outcome"] == "True"
@@ -426,7 +426,7 @@ class TestToxEnv:
         """Test ignore_outcome setting unignore_outcomes = False."""
         tox_ini = tox_ini_ignore_outcome_unignore_outcomes
         with self.configure(
-            tmpdir, monkeypatch, tox_ini, travis_language='generic'
+            tmpdir, monkeypatch, tox_ini, travis_version='3.4'
         ):
             config = self.tox_config()
             assert config["testenv:py34"]["ignore_outcome"] == "False"
@@ -436,7 +436,7 @@ class TestToxEnv:
         """Test ignore_outcome setting unignore_outcomes = False (default)."""
         tox_ini = tox_ini_ignore_outcome_not_unignore_outcomes
         with self.configure(
-            tmpdir, monkeypatch, tox_ini, travis_language='generic'
+            tmpdir, monkeypatch, tox_ini, travis_version='3.4'
         ):
             config = self.tox_config()
             assert config["testenv:py34"]["ignore_outcome"] == "True"
