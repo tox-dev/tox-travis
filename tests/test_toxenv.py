@@ -119,27 +119,33 @@ unignore_outcomes = False
 class TestToxEnv:
     """Test the logic to automatically configure TOXENV with Travis."""
 
-    def tox_envs(self):
+    def tox_envs(self, **kwargs):
         """Find the envs that tox sees."""
-        returncode, stdout, stderr = self.tox_envs_raw()
+        returncode, stdout, stderr = self.tox_envs_raw(**kwargs)
         assert returncode == 0, stderr
         return [env for env in stdout.strip().split('\n')]
 
-    def tox_envs_raw(self):
+    def tox_envs_raw(self, ini_filename=None):
         """Return the raw output of finding what tox sees."""
-        return self.call_raw(['tox', '-l'])
+        command = ['tox', '-l']
+        if ini_filename is not None:
+            command += ['-c', ini_filename]
+        return self.call_raw(command)
 
-    def tox_config(self):
+    def tox_config(self, **kwargs):
         """Returns the configuration per configuration as computed by tox."""
-        returncode, stdout, stderr = self.tox_config_raw()
+        returncode, stdout, stderr = self.tox_config_raw(**kwargs)
         assert returncode == 0, stderr
         ini = "[global]\n" + re.sub(
             re.compile(r'^\s+', re.MULTILINE), '', stdout)
         return py.iniconfig.IniConfig('', data=ini)
 
-    def tox_config_raw(self):
+    def tox_config_raw(self, ini_filename=None):
         """Return the raw output of finding the complex tox env config."""
-        return self.call_raw(['tox', '--showconfig'])
+        command = ['tox', '--showconfig']
+        if ini_filename is not None:
+            command += ['-c', ini_filename]
+        return self.call_raw(command)
 
     def call_raw(self, command):
         """Return the raw output of the given command."""
@@ -152,10 +158,11 @@ class TestToxEnv:
     def configure(self, tmpdir, monkeypatch, tox_ini,
                   version=None, major=None, minor=None,
                   travis_version=None, travis_os=None,
-                  travis_language=None, env=None):
+                  travis_language=None, env=None,
+                  ini_filename='tox.ini'):
         """Configure the environment for running a test."""
         origdir = tmpdir.chdir()
-        tmpdir.join('tox.ini').write(tox_ini)
+        tmpdir.join(ini_filename).write(tox_ini)
         tmpdir.join('.coveragerc').write(coverage_config)
 
         if version or travis_version or travis_os or travis_language:
@@ -201,6 +208,12 @@ class TestToxEnv:
                 'pypy', 'pypy3', 'docs',
             ]
             assert self.tox_envs() == expected
+
+    def test_travis_config_filename(self, tmpdir, monkeypatch):
+        """Give the correct env for CPython 2.7."""
+        with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 6,
+                            ini_filename='spam.ini'):
+            assert self.tox_envs(ini_filename='spam.ini') == ['py36']
 
     def test_travis_default_26(self, tmpdir, monkeypatch):
         """Give the correct env for CPython 2.6."""

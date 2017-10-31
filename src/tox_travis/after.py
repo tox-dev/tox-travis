@@ -4,7 +4,6 @@ import os
 import sys
 import json
 import time
-import py
 
 from tox.config import _split_env as split_env
 try:
@@ -32,18 +31,18 @@ def travis_after_monkeypatch():
         retcode = real_subcommand_test(self)
         if retcode == 0 and self.config.option.travis_after:
             # No need to run if the tests failed anyway
-            travis_after(self.config.envlist)
+            travis_after(self.config.envlist, self.config._cfg)
         return retcode
     tox.session.Session.subcommand_test = subcommand_test
 
 
-def travis_after(envlist):
+def travis_after(envlist, ini):
     """Wait for all jobs to finish, then exit successfully."""
     # after-all disabled for pull requests
     if os.environ.get('TRAVIS_PULL_REQUEST', 'false') != 'false':
         return
 
-    if not after_config_matches(envlist):
+    if not after_config_matches(envlist, ini):
         return  # This is not the one that needs to wait
 
     github_token = os.environ.get('GITHUB_TOKEN')
@@ -77,10 +76,9 @@ def travis_after(envlist):
     print('All required jobs were successful.')
 
 
-def after_config_matches(envlist):
+def after_config_matches(envlist, ini):
     """Determine if this job should wait for the others."""
-    config = py.iniconfig.IniConfig('tox.ini')
-    section = config.sections.get('travis:after', {})
+    section = ini.sections.get('travis:after', {})
 
     if not section:
         return False  # Never wait if it's not configured
