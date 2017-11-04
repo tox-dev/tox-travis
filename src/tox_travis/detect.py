@@ -30,7 +30,12 @@ def detect_envlist(config):
                          passthru=len(desired_factors) == 1)
 
     # Make the envconfig for undeclared matched envs
-    autogen_envconfigs(config, set(matched) - set(config.envconfigs))
+    undeclared = set(matched) - set(config.envconfigs)
+    if undeclared:
+        print('Matching undeclared envs is deprecated. Be sure all the '
+              'envs that Tox should run are declared in the tox config.',
+              file=sys.stderr)
+    autogen_envconfigs(config, undeclared)
 
     config.envlist = matched
 
