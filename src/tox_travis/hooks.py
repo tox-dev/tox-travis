@@ -11,7 +11,7 @@ from .after import travis_after_monkeypatch
 
 @tox.hookimpl
 def tox_addoption(parser):
-    """Add arguments and override TOXENV."""
+    """Add arguments and needed monkeypatches."""
     parser.add_argument(
         '--travis-after', dest='travis_after', action='store_true',
         help='Exit successfully after all Travis jobs complete successfully.')

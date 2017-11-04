@@ -1,4 +1,4 @@
-"""Default TOXENV based on the Travis environment."""
+"""Default Tox envlist based on the Travis environment."""
 from __future__ import print_function
 from itertools import product
 import os

@@ -124,8 +124,8 @@ def get_job_statuses(github_token, api_url, build_id,
         build = get_json('{api_url}/builds/{build_id}'.format(
             api_url=api_url, build_id=build_id), auth=auth)
         jobs = [job for job in build['jobs']
-                if job['number'] != job_number
-                and not job['allow_failure']]  # Ignore allowed failures
+                if job['number'] != job_number and
+                not job['allow_failure']]  # Ignore allowed failures
         if all(job['finished_at'] for job in jobs):
             break  # All the jobs have completed
         elif any(job['state'] != 'passed'
