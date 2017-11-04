@@ -2,7 +2,7 @@
 import os
 import tox
 from .detect import (
-    default_toxenv,
+    detect_envlist,
     override_ignore_outcome,
 )
 from .hacks import pypy_version_monkeypatch
@@ -26,5 +26,5 @@ def tox_configure(config):
     if 'TRAVIS' in os.environ:
         if config.option.travis_after:
             travis_after_monkeypatch()
-        default_toxenv(config)
+        detect_envlist(config)
         override_ignore_outcome(config)

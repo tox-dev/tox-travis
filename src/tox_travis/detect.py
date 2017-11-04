@@ -9,7 +9,7 @@ from tox.config import _split_env as split_env
 from .utils import TRAVIS_FACTORS, parse_dict
 
 
-def default_toxenv(config):
+def detect_envlist(config):
     """Default envlist automatically based on the Travis environment."""
     if 'TOXENV' in os.environ or config.option.env:
         return  # Skip any processing if already set
