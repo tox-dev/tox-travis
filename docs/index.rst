@@ -6,7 +6,7 @@ Topics
 .. toctree::
    :maxdepth: 1
 
-   toxenv
+   detect
    after
    contributing
    history

@@ -1,7 +1,7 @@
 """Tox hook implementations."""
 import os
 import tox
-from .toxenv import (
+from .detect import (
     default_toxenv,
     override_ignore_outcome,
 )
