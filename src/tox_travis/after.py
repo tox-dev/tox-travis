@@ -83,8 +83,12 @@ def after_config_matches(envlist, ini):
     if not section:
         return False  # Never wait if it's not configured
 
-    if 'toxenv' in section:
-        required = set(split_env(section['toxenv']))
+    if 'envlist' in section or 'toxenv' in section:
+        if 'toxenv' in section:
+            print('The "toxenv" key of the [after] section is deprecated '
+                  'in favor of the "envlist" key.', file=sys.stderr)
+
+        required = set(split_env(section.get('envlist', section['toxenv'])))
         actual = set(envlist)
         if required - actual:
             return False
