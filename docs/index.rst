@@ -6,7 +6,7 @@ Topics
 .. toctree::
    :maxdepth: 1
 
-   detect
+   envlist
    after
    contributing
    history

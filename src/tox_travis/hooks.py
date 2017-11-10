@@ -1,7 +1,7 @@
 """Tox hook implementations."""
 import os
 import tox
-from .detect import (
+from .envlist import (
     detect_envlist,
     override_ignore_outcome,
 )
