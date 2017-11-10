@@ -101,7 +101,7 @@ that you are shipping a working release.
 The accepted configuration keys
 in the ``[travis:after]`` section are:
 
-* ``toxenv``. Match with the running toxenvs.
+* ``envlist``. Match with the running toxenvs.
   Expansion is allowed, and if set *all* environments listed
   must be run in the current Tox run.
 * ``travis``. Match with known Travis factors,
