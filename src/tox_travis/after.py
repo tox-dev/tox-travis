@@ -85,10 +85,11 @@ def after_config_matches(envlist, ini):
 
     if 'envlist' in section or 'toxenv' in section:
         if 'toxenv' in section:
-            print('The "toxenv" key of the [after] section is deprecated '
-                  'in favor of the "envlist" key.', file=sys.stderr)
+            print('The "toxenv" key of the [travis:after] section is '
+                  'deprecated in favor of the "envlist" key.', file=sys.stderr)
 
-        required = set(split_env(section.get('envlist', section['toxenv'])))
+        toxenv = section.get('toxenv')
+        required = set(split_env(section.get('envlist', toxenv) or ''))
         actual = set(envlist)
         if required - actual:
             return False

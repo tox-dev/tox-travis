@@ -1,6 +1,10 @@
 """Tests of the --travis-after flag."""
 import pytest
-from tox_travis.after import travis_after
+import py
+from tox_travis.after import (
+    travis_after,
+    after_config_matches,
+)
 
 
 class TestAfter:
@@ -294,3 +298,106 @@ class TestAfter:
         assert excinfo.value.code == 35
         out, err = capsys.readouterr()
         assert 'Some jobs were not successful.' in out
+
+    def test_after_config_matches_unconfigured(self):
+        """Skip quickly when after section is unconfigured."""
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert not after_config_matches(['py36'], ini)
+
+    def test_after_config_matches_toxenv_match(self, capsys):
+        """Test that it works using the legacy toxenv setting.
+
+        It should also give a warning message.
+        """
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+            '\n'
+            '[travis:after]\n'
+            'toxenv = py36\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert after_config_matches(['py36'], ini)
+        out, err = capsys.readouterr()
+        msg = 'The "toxenv" key of the [travis:after] section is deprecated'
+        assert msg in err
+
+    def test_after_config_matches_toxenv_nomatch(self, capsys):
+        """Test that it doesn't work using the legacy toxenv setting.
+
+        It should also give a warning message.
+        """
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+            '\n'
+            '[travis:after]\n'
+            'toxenv = py36\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert not after_config_matches(['py35'], ini)
+        out, err = capsys.readouterr()
+        msg = 'The "toxenv" key of the [travis:after] section is deprecated'
+        assert msg in err
+
+    def test_after_config_matches_envlist_match(self):
+        """Test that it works."""
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+            '\n'
+            '[travis:after]\n'
+            'envlist = py36\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert after_config_matches(['py36'], ini)
+
+    def test_after_config_matches_envlist_nomatch(self):
+        """Test that it doesn't work."""
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+            '\n'
+            '[travis:after]\n'
+            'envlist = py36\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert not after_config_matches(['py35'], ini)
+
+    def test_after_config_matches_env_match(self, monkeypatch):
+        """Test that it works."""
+        monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.6')
+        monkeypatch.setenv('DJANGO', '1.11')
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+            '\n'
+            '[travis:after]\n'
+            'travis =\n'
+            '    python: 3.6\n'
+            'env =\n'
+            '    DJANGO: 1.11\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert after_config_matches(['py36'], ini)
+
+    def test_after_config_matches_env_nomatch(self, monkeypatch):
+        """Test that it doesn't work."""
+        monkeypatch.setenv('TRAVIS_PYTHON_VERSION', '3.5')
+        monkeypatch.setenv('DJANGO', '1.11')
+        inistr = (
+            '[tox]\n'
+            'envlist = py36\n'
+            '\n'
+            '[travis:after]\n'
+            'travis =\n'
+            '    python: 3.6\n'
+            'env =\n'
+            '    DJANGO: 1.11\n'
+        )
+        ini = py.iniconfig.IniConfig('', data=inistr)
+        assert not after_config_matches(['py35'], ini)
