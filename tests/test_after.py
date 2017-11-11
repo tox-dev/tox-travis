@@ -23,6 +23,13 @@ class TestAfter:
         assert out == ''
         assert err == ''
 
+    def test_not_after_config_matches(self, mocker, monkeypatch, capsys):
+        """Return silently when no config matches."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=False)
+        monkeypatch.setenv('TRAVIS', 'true')
+        travis_after(mocker.Mock(), mocker.Mock())
+
     def test_no_github_token(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no github token."""
         mocker.patch('tox_travis.after.after_config_matches',
