@@ -22,16 +22,16 @@ INCOMPLETE_TRAVIS_ENVIRONMENT = 34
 JOBS_FAILED = 35
 
 
-def travis_after_monkeypatch():
+def travis_after_monkeypatch(ini, envlist):
     """Monkeypatch the Tox session to wait for jobs to finish."""
     import tox.session
     real_subcommand_test = tox.session.Session.subcommand_test
 
     def subcommand_test(self):
         retcode = real_subcommand_test(self)
-        if retcode == 0 and self.config.option.travis_after:
+        if retcode == 0:
             # No need to run if the tests failed anyway
-            travis_after(self.config.envlist, self.config._cfg)
+            travis_after(envlist, ini)
         return retcode
     tox.session.Session.subcommand_test = subcommand_test
 
