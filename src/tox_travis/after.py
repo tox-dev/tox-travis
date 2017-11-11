@@ -22,27 +22,13 @@ INCOMPLETE_TRAVIS_ENVIRONMENT = 34
 JOBS_FAILED = 35
 
 
-def travis_after_monkeypatch(ini, envlist):
-    """Monkeypatch the Tox session to wait for jobs to finish."""
-    import tox.session
-    real_subcommand_test = tox.session.Session.subcommand_test
-
-    def subcommand_test(self):
-        retcode = real_subcommand_test(self)
-        if retcode == 0:
-            # No need to run if the tests failed anyway
-            travis_after(envlist, ini)
-        return retcode
-    tox.session.Session.subcommand_test = subcommand_test
-
-
-def travis_after(envlist, ini):
+def travis_after(ini, envlist):
     """Wait for all jobs to finish, then exit successfully."""
     # after-all disabled for pull requests
     if os.environ.get('TRAVIS_PULL_REQUEST', 'false') != 'false':
         return
 
-    if not after_config_matches(envlist, ini):
+    if not after_config_matches(ini, envlist):
         return  # This is not the one that needs to wait
 
     github_token = os.environ.get('GITHUB_TOKEN')
@@ -76,7 +62,7 @@ def travis_after(envlist, ini):
     print('All required jobs were successful.')
 
 
-def after_config_matches(envlist, ini):
+def after_config_matches(ini, envlist):
     """Determine if this job should wait for the others."""
     section = ini.sections.get('travis:after', {})
 
