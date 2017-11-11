@@ -60,7 +60,7 @@ setup(
     long_description=io.open('README.rst', encoding='utf-8').read(),
     author='Ryan Hiebert',
     author_email='ryan@ryanhiebert.com',
-    url='https://github.com/ryanhiebert/tox-travis',
+    url='https://github.com/tox-dev/tox-travis',
     license='MIT',
     version='0.8',
     package_dir={'': 'src'},
