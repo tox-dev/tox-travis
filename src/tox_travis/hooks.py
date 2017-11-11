@@ -1,8 +1,11 @@
 """Tox hook implementations."""
+from __future__ import print_function
 import os
+import sys
 import tox
-from .toxenv import (
-    default_toxenv,
+from .envlist import (
+    detect_envlist,
+    autogen_envconfigs,
     override_ignore_outcome,
 )
 from .hacks import pypy_version_monkeypatch
@@ -11,7 +14,7 @@ from .after import travis_after_monkeypatch
 
 @tox.hookimpl
 def tox_addoption(parser):
-    """Add arguments and override TOXENV."""
+    """Add arguments and needed monkeypatches."""
     parser.add_argument(
         '--travis-after', dest='travis_after', action='store_true',
         help='Exit successfully after all Travis jobs complete successfully.')
@@ -23,8 +26,27 @@ def tox_addoption(parser):
 @tox.hookimpl
 def tox_configure(config):
     """Check for the presence of the added options."""
-    if 'TRAVIS' in os.environ:
-        if config.option.travis_after:
-            travis_after_monkeypatch()
-        default_toxenv(config)
-        override_ignore_outcome(config)
+    if 'TRAVIS' not in os.environ:
+        return
+
+    ini = config._cfg
+
+    # envlist
+    if 'TOXENV' not in os.environ and not config.option.env:
+        envlist = detect_envlist(ini)
+        undeclared = set(envlist) - set(config.envconfigs)
+        if undeclared:
+            print('Matching undeclared envs is deprecated. Be sure all the '
+                  'envs that Tox should run are declared in the tox config.',
+                  file=sys.stderr)
+            autogen_envconfigs(config, undeclared)
+        config.envlist = envlist
+
+    # Override ignore_outcomes
+    if override_ignore_outcome(ini):
+        for envconfig in config.envconfigs.values():
+            envconfig.ignore_outcome = False
+
+    # after
+    if config.option.travis_after:
+        travis_after_monkeypatch(ini, config.envlist)

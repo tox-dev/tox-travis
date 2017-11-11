@@ -22,16 +22,16 @@ INCOMPLETE_TRAVIS_ENVIRONMENT = 34
 JOBS_FAILED = 35
 
 
-def travis_after_monkeypatch():
+def travis_after_monkeypatch(ini, envlist):
     """Monkeypatch the Tox session to wait for jobs to finish."""
     import tox.session
     real_subcommand_test = tox.session.Session.subcommand_test
 
     def subcommand_test(self):
         retcode = real_subcommand_test(self)
-        if retcode == 0 and self.config.option.travis_after:
+        if retcode == 0:
             # No need to run if the tests failed anyway
-            travis_after(self.config.envlist, self.config._cfg)
+            travis_after(envlist, ini)
         return retcode
     tox.session.Session.subcommand_test = subcommand_test
 
@@ -83,8 +83,13 @@ def after_config_matches(envlist, ini):
     if not section:
         return False  # Never wait if it's not configured
 
-    if 'toxenv' in section:
-        required = set(split_env(section['toxenv']))
+    if 'envlist' in section or 'toxenv' in section:
+        if 'toxenv' in section:
+            print('The "toxenv" key of the [travis:after] section is '
+                  'deprecated in favor of the "envlist" key.', file=sys.stderr)
+
+        toxenv = section.get('toxenv')
+        required = set(split_env(section.get('envlist', toxenv) or ''))
         actual = set(envlist)
         if required - actual:
             return False
@@ -120,8 +125,8 @@ def get_job_statuses(github_token, api_url, build_id,
         build = get_json('{api_url}/builds/{build_id}'.format(
             api_url=api_url, build_id=build_id), auth=auth)
         jobs = [job for job in build['jobs']
-                if job['number'] != job_number
-                and not job['allow_failure']]  # Ignore allowed failures
+                if job['number'] != job_number and
+                not job['allow_failure']]  # Ignore allowed failures
         if all(job['finished_at'] for job in jobs):
             break  # All the jobs have completed
         elif any(job['state'] != 'passed'

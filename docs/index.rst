@@ -6,7 +6,7 @@ Topics
 .. toctree::
    :maxdepth: 1
 
-   toxenv
+   envlist
    after
    contributing
    history

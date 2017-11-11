@@ -1,4 +1,4 @@
-"""Default TOXENV based on the Travis environment."""
+"""Default Tox envlist based on the Travis environment."""
 from __future__ import print_function
 from itertools import product
 import os
@@ -9,13 +9,8 @@ from tox.config import _split_env as split_env
 from .utils import TRAVIS_FACTORS, parse_dict
 
 
-def default_toxenv(config):
+def detect_envlist(ini):
     """Default envlist automatically based on the Travis environment."""
-    if 'TOXENV' in os.environ or config.option.env:
-        return  # Skip any processing if already set
-
-    ini = config._cfg
-
     # Find the envs that tox knows about
     declared_envs = get_declared_envs(ini)
 
@@ -26,13 +21,8 @@ def default_toxenv(config):
     desired_envs = ['-'.join(env) for env in product(*desired_factors)]
 
     # Find matching envs
-    matched = match_envs(declared_envs, desired_envs,
-                         passthru=len(desired_factors) == 1)
-
-    # Make the envconfig for undeclared matched envs
-    autogen_envconfigs(config, set(matched) - set(config.envconfigs))
-
-    config.envlist = matched
+    return match_envs(declared_envs, desired_envs,
+                      passthru=len(desired_factors) == 1)
 
 
 def autogen_envconfigs(config, envs):
@@ -232,9 +222,7 @@ def env_matches(declared, desired):
     return all(factor in declared_factors for factor in desired_factors)
 
 
-def override_ignore_outcome(config):
-    """Override ignore_outcome if unignore_outcomes is set to True."""
-    travis_reader = tox.config.SectionReader("travis", config._cfg)
-    if travis_reader.getbool('unignore_outcomes', False):
-        for envconfig in config.envconfigs.values():
-            envconfig.ignore_outcome = False
+def override_ignore_outcome(ini):
+    """Decide whether to override ignore_outcomes."""
+    travis_reader = tox.config.SectionReader("travis", ini)
+    return travis_reader.getbool('unignore_outcomes', False)
