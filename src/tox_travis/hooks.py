@@ -8,8 +8,11 @@ from .envlist import (
     autogen_envconfigs,
     override_ignore_outcome,
 )
-from .hacks import pypy_version_monkeypatch
-from .after import travis_after_monkeypatch
+from .hacks import (
+    pypy_version_monkeypatch,
+    subcommand_test_monkeypatch,
+)
+from .after import travis_after
 
 
 @tox.hookimpl
@@ -21,6 +24,7 @@ def tox_addoption(parser):
 
     if 'TRAVIS' in os.environ:
         pypy_version_monkeypatch()
+        subcommand_test_monkeypatch(tox_subcommand_test_post)
 
 
 @tox.hookimpl
@@ -47,6 +51,8 @@ def tox_configure(config):
         for envconfig in config.envconfigs.values():
             envconfig.ignore_outcome = False
 
-    # after
+
+def tox_subcommand_test_post(config):
+    """Wait for this job if the configuration matches."""
     if config.option.travis_after:
-        travis_after_monkeypatch(ini, config.envlist)
+        travis_after(config._cfg, config.envlist)

@@ -23,6 +23,13 @@ class TestAfter:
         assert out == ''
         assert err == ''
 
+    def test_not_after_config_matches(self, mocker, monkeypatch, capsys):
+        """Return silently when no config matches."""
+        mocker.patch('tox_travis.after.after_config_matches',
+                     return_value=False)
+        monkeypatch.setenv('TRAVIS', 'true')
+        travis_after(mocker.Mock(), mocker.Mock())
+
     def test_no_github_token(self, mocker, monkeypatch, capsys):
         """Raise with the right message when no github token."""
         mocker.patch('tox_travis.after.after_config_matches',
@@ -306,7 +313,7 @@ class TestAfter:
             'envlist = py36\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert not after_config_matches(['py36'], ini)
+        assert not after_config_matches(ini, ['py36'])
 
     def test_after_config_matches_toxenv_match(self, capsys):
         """Test that it works using the legacy toxenv setting.
@@ -321,7 +328,7 @@ class TestAfter:
             'toxenv = py36\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert after_config_matches(['py36'], ini)
+        assert after_config_matches(ini, ['py36'])
         out, err = capsys.readouterr()
         msg = 'The "toxenv" key of the [travis:after] section is deprecated'
         assert msg in err
@@ -339,7 +346,7 @@ class TestAfter:
             'toxenv = py36\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert not after_config_matches(['py35'], ini)
+        assert not after_config_matches(ini, ['py35'])
         out, err = capsys.readouterr()
         msg = 'The "toxenv" key of the [travis:after] section is deprecated'
         assert msg in err
@@ -354,7 +361,7 @@ class TestAfter:
             'envlist = py36\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert after_config_matches(['py36'], ini)
+        assert after_config_matches(ini, ['py36'])
 
     def test_after_config_matches_envlist_nomatch(self):
         """Test that it doesn't work."""
@@ -366,7 +373,7 @@ class TestAfter:
             'envlist = py36\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert not after_config_matches(['py35'], ini)
+        assert not after_config_matches(ini, ['py35'])
 
     def test_after_config_matches_env_match(self, monkeypatch):
         """Test that it works."""
@@ -383,7 +390,7 @@ class TestAfter:
             '    DJANGO: 1.11\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert after_config_matches(['py36'], ini)
+        assert after_config_matches(ini, ['py36'])
 
     def test_after_config_matches_env_nomatch(self, monkeypatch):
         """Test that it doesn't work."""
@@ -400,4 +407,4 @@ class TestAfter:
             '    DJANGO: 1.11\n'
         )
         ini = py.iniconfig.IniConfig('', data=inistr)
-        assert not after_config_matches(['py35'], ini)
+        assert not after_config_matches(ini, ['py35'])

@@ -16,3 +16,16 @@ def pypy_version_monkeypatch():
     version = os.environ.get('TRAVIS_PYTHON_VERSION')
     if version and default_factors and version.startswith('pypy3.3-'):
         default_factors['pypy3'] = 'python'
+
+
+def subcommand_test_monkeypatch(post):
+    """Monkeypatch Tox session to call a hook when commands finish."""
+    import tox.session
+    real_subcommand_test = tox.session.Session.subcommand_test
+
+    def subcommand_test(self):
+        retcode = real_subcommand_test(self)
+        post(self.config)
+        return retcode
+
+    tox.session.Session.subcommand_test = subcommand_test
