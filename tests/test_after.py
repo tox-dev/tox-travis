@@ -1,14 +1,64 @@
 """Tests of the --travis-after flag."""
 import pytest
 import py
+import subprocess
+from contextlib import contextmanager
 from tox_travis.after import (
     travis_after,
     after_config_matches,
 )
 
 
+ini = b"""
+[tox]
+envlist = py35, py36
+"""
+
+coverage_config = b"""
+[run]
+branch = True
+parallel = True
+source = tox_travis
+
+[paths]
+source =
+    src
+    */site-packages
+"""
+
+
 class TestAfter:
     """Test the logic of waiting for other jobs to finish."""
+
+    def call(self, command):
+        """Return the raw output of the given command."""
+        proc = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        return proc.returncode, stdout.decode('utf-8'), stderr.decode('utf-8')
+
+    @contextmanager
+    def configure(self, tmpdir, monkeypatch, tox_ini, version):
+        """Configure the environment for a test."""
+        origdir = tmpdir.chdir()
+        tmpdir.join('tox.ini').write(tox_ini)
+        tmpdir.join('.coveragerc').write(coverage_config)
+        monkeypatch.setenv('TRAVIS', 'true')
+        monkeypatch.setenv('TRAVIS_PYTHON_VERSION', version)
+
+        yield
+
+        # Change back to the original directory
+        # Copy .coverage.* report files
+        origdir.chdir()
+        for f in tmpdir.listdir(lambda f: f.basename.startswith('.coverage.')):
+            f.copy(origdir)
+
+    def test_after_deprecated(self, tmpdir, monkeypatch):
+        """Show deprecation message when using --travis-after."""
+        with self.configure(tmpdir, monkeypatch, ini, '3.6'):
+            _, _, stderr = self.call(['tox', '-l', '--travis-after'])
+            assert 'The after all feature has been deprecated.' in stderr
 
     def test_pull_request(self, mocker, monkeypatch, capsys):
         """Pull requests should not run after-all."""

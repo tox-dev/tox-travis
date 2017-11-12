@@ -1,6 +1,11 @@
 0.10 (TBD)
 ++++++++++
 
+* Deprecate the After All feature.
+  Travis now has `Build Stages`_, which are a better solution.
+
+.. _`Build Stages`: https://docs.travis-ci.com/user/build-stages
+
 
 0.9 (2017-11-12)
 ++++++++++++++++

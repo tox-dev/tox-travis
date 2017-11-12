@@ -18,21 +18,27 @@ install:
  - pip install wheel codecov coverage
  - python setup.py bdist_wheel
  - pip install ./dist/tox_travis-*.whl
-script:
- - tox --installpkg ./dist/tox_travis-*.whl --travis-after
+script: tox --installpkg ./dist/tox_travis-*.whl
 after_success: coverage combine && codecov
 
-branches:
-  only:
-    - master
-    - /^\d+(\.\d+)*$/
-matrix:
+if: tag IS present OR branch = master
+jobs:
   fast_finish: true
   include:
   - python: 3.6
     env: TOXENV=docs
   - python: 3.6
     env: TOXENV=desc
+  - stage: deploy
+    python: 3.6
+    env: TRAVIS_STAGE=deploy
+    install: true
+    script: true
+    after_success: true
+
+stages:
+  - name: deploy
+    if: tag IS present
 
 deploy:
   provider: pypi
@@ -41,6 +47,5 @@ deploy:
     secure: KjQrEjwmfP+jqdHNQ6bJoNjOJHHz0kirrSORat2uJTulXaUs/nuDcZqTu7gxMFaM92z3eJZzTZmxO71cDhJiBt+FQhEtL/q8wd7Fv5d5v5EIlLFNqdEyCaTthSgXQa/HJTtbzjdFIEN8qCofHu+zEWMnb1ZHgUcK7hZHMCrHcVF4kD+k1myNro+1Pp/sGIUMUOkqocz+8OI2FuEQh0txXl0MLf2UEk53EK2noD4D/fm/YDDYJbAWlNPBbCBaU/ZGfzuFivh00bx9lAg7UB6t/A3iIasRUiAJbHdxvrxxGFAeOV/t09TcTtEcwBRyPe8JzSuReCROccyFB2TLOzfkt9h7TkdC2CWrMmXpI6UogTct++r3kavdsJuAZMbSy1jrnxkxtB1CW7DOly4v4JuyewpET7CnTjkhd9zIowESwJFjxwmns63AS2okQdPTCqsbbNp53Jk5fpf6qXwMFdaHT1kU1MpwoQPT0HnwLz3xybvjgfgu3t4KfEBvc0DCp89VMjCM9xkKTlziZkwOhXqaNhu+cVqo1/eUY/HDT/7V7xiL/U6U11UOrqtxkdDofoIl4NuiT7uoVaVctm/Y4kBEkJRZCwcjRsZJ0c06SvMvxhMDBUEM5IiXS6tH6Zp08MDYlclpKFGKdzOrxP2X0rVFIZ99KLyhfRNZuZcu92tDpP8=
   on:
     tags: true
-    python: 3.6
-    condition: $TOXENV != docs && $TOXENV != desc
+    condition: $TRAVIS_STAGE = deploy
   distributions: bdist_wheel

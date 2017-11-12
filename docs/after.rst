@@ -2,6 +2,22 @@
 After All
 =========
 
+.. deprecated:: 0.10
+
+.. warning::
+
+  This feature is deprecated.
+
+  Travis has added `Build Stages`_,
+  which are a better solution to this problem.
+  You will also likely want to check out `Conditions`_,
+  which make it much easier to determine
+  which jobs, stages, and builds will run.
+
+.. _`Build Stages`: https://docs.travis-ci.com/user/build-stages
+.. _`Conditions`: https://docs.travis-ci.com/user/conditional-builds-stages-jobs
+
+
 Inspired by `travis-after-all`_ and `travis_after_all`_,
 this feature allows a job to wait for other jobs to finish
 before it calls itself complete.
@@ -77,7 +93,7 @@ that corresponds to using the above ``travis:after`` section:
 This example deploys when the build is from a tag
 and the build is on Python 3.5
 and the build is using DJANGO="1.8".
-Together ``tox --travis-after`` and Tox's ``on`` conditions
+Together ``tox --travis-after`` and Travis' ``on`` conditions
 make sure that the deploy only happens after all tests pass.
 
 If any configuration item does not match,

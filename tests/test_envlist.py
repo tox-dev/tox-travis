@@ -210,7 +210,7 @@ class TestToxEnv:
             assert self.tox_envs() == expected
 
     def test_travis_config_filename(self, tmpdir, monkeypatch):
-        """Give the correct env for CPython 2.7."""
+        """Give the correct env for manual filename."""
         with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 6,
                             ini_filename='spam.ini'):
             assert self.tox_envs(ini_filename='spam.ini') == ['py36']
