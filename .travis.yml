@@ -14,9 +14,6 @@ python:
  - "pypy3.3-5.5-alpha"
  - "3.7-dev"
 
-before_install:
- # Show the current setuptools version
- - python -c "import setuptools; print(setuptools.__version__)"
 install:
  - pip install wheel codecov coverage
  - python setup.py bdist_wheel

@@ -13,6 +13,10 @@
 * Various refactors and test improvements.
   - thanks to @jdufresne for several pull requests
   and @rpkilby for many reviews.
+* Only deploy the universal wheel to PyPI.
+  Due to a deployment bug, a version-specific egg was released,
+  along with the intended sdist and wheel.
+  The sdist has also been abandoned for release.
 
 0.8 (2017-01-11)
 ++++++++++++++++
