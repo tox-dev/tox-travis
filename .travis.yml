@@ -19,10 +19,9 @@ before_install:
  - python -c "import setuptools; print(setuptools.__version__)"
 install:
  - pip install wheel codecov coverage
- - python setup.py install bdist_wheel
+ - python setup.py bdist_wheel
  - pip install ./dist/tox_travis-*.whl
 script:
- - tox
  - tox --installpkg ./dist/tox_travis-*.whl --travis-after
 after_success: coverage combine && codecov
 
@@ -47,4 +46,4 @@ deploy:
     tags: true
     python: 3.6
     condition: $TOXENV != docs && $TOXENV != desc
-  distributions: sdist bdist_wheel
+  distributions: bdist_wheel
