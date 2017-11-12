@@ -23,14 +23,11 @@ after_success: coverage combine && codecov
 
 stages:
   - name: test
-    if: tag =~ ^\d+(\.\d+)*$
+    if: tag IS present
   - name: deploy
-    if: tag =~ ^\d+(\.\d+)*$
+    if: tag IS present
 
-branches:
-  only:
-    - master
-    - /^\d+(\.\d+)*$/
+if: tag IS present OR branch = master
 jobs:
   fast_finish: true
   include:
@@ -43,10 +40,6 @@ jobs:
     script: true
   - stage: experiment
     python: 3.6
-    env:
-      - SPAM_HAM=true
-      - SPAM_EGGS=true
-    before_install: env | grep SPAM
     install: true
     script: true
   - stage: deploy
