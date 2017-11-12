@@ -44,7 +44,7 @@ jobs:
     script: true
   - stage: deploy
     python: 3.6
-    env: DEPLOY=true
+    env: TRAVIS_STAGE=deploy
     install: true
     script: true
 
@@ -56,5 +56,5 @@ deploy:
   on:
     tags: true
     python: 3.6
-    condition: $DEPLOY = true
+    condition: $TRAVIS_STAGE = deploy
   distributions: bdist_wheel
