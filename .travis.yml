@@ -43,9 +43,11 @@ jobs:
     script: true
   - stage: experiment
     python: 3.6
-    env: SPAM=true
-    before_install: env | grep 'TRAVIS' | grep 'STAGE'
-    install: pip freeze
+    env:
+      - SPAM_HAM=true
+      - SPAM_EGGS=true
+    before_install: env | grep SPAM
+    install: true
     script: true
   - stage: deploy
     python: 3.6
