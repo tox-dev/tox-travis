@@ -1,5 +1,5 @@
-0.9 (TBD)
-+++++++++
+0.9 (2011-11-12)
+++++++++++++++++
 
 * Allow PyPy3 support to work with PyPy3 5.5 (#66).
   - thanks to @kirbyfan64 for the pull request.
