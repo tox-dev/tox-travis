@@ -62,7 +62,7 @@ setup(
     author_email='ryan@ryanhiebert.com',
     url='https://github.com/tox-dev/tox-travis',
     license='MIT',
-    version='0.8',
+    version='0.9',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     entry_points={
