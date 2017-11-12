@@ -18,21 +18,24 @@ install:
  - pip install wheel codecov coverage
  - python setup.py bdist_wheel
  - pip install ./dist/tox_travis-*.whl
-script:
- - tox --installpkg ./dist/tox_travis-*.whl --travis-after
+script: tox --installpkg ./dist/tox_travis-*.whl
 after_success: coverage combine && codecov
 
-branches:
-  only:
-    - master
-    - /^\d+(\.\d+)*$/
-matrix:
+if: tag IS present OR branch = master
+jobs:
   fast_finish: true
   include:
   - python: 3.6
     env: TOXENV=docs
   - python: 3.6
     env: TOXENV=desc
+  - stage: deploy
+    python: 3.6
+    env: TRAVIS_STAGE=deploy
+
+stages:
+  - name: deploy
+    if: tag IS present
 
 deploy:
   provider: pypi
@@ -42,5 +45,5 @@ deploy:
   on:
     tags: true
     python: 3.6
-    condition: $TOXENV != docs && $TOXENV != desc
+    condition: $TRAVIS_STAGE = deploy
   distributions: bdist_wheel
