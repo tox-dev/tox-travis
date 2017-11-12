@@ -17,7 +17,7 @@
 * Various refactors and test improvements.
   - thanks to @jdufresne for several pull requests
   and @rpkilby for many reviews.
-* Only deploy the universal wheel to PyPI.
+* Only deploy the universal wheel to PyPI (#87).
   Due to a deployment bug, a version-specific egg was released,
   along with the intended sdist and wheel.
   The sdist has also been abandoned for release.
