@@ -21,32 +21,21 @@ install:
 script: tox --installpkg ./dist/tox_travis-*.whl
 after_success: coverage combine && codecov
 
-stages:
-  - name: test
-    if: tag IS present
-  - name: deploy
-    if: tag IS present
-
 if: tag IS present OR branch = master
 jobs:
   fast_finish: true
   include:
   - python: 3.6
     env: TOXENV=docs
-  - stage: prepare
-    python: 3.6
+  - python: 3.6
     env: TOXENV=desc
-    install: true
-    script: true
-  - stage: experiment
-    python: 3.6
-    install: true
-    script: true
   - stage: deploy
     python: 3.6
     env: TRAVIS_STAGE=deploy
-    install: true
-    script: true
+
+stages:
+  - name: deploy
+    if: tag IS present
 
 deploy:
   provider: pypi
