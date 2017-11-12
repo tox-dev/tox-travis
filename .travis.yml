@@ -22,6 +22,8 @@ script: tox --installpkg ./dist/tox_travis-*.whl
 after_success: coverage combine && codecov
 
 stages:
+  - name: test
+    if: tag =~ ^\d+(\.\d+)*$
   - name: deploy
     if: tag =~ ^\d+(\.\d+)*$
 
@@ -38,13 +40,13 @@ jobs:
     env: TOXENV=desc
   - stage: experiment
     python: 3.6
-    env:
-    install:
+    env: SPAM=true
+    before_install: env | grep 'TRAVIS'
+    install: pip freeze
     script:
   - stage: deploy
     python: 3.6
     env: DEPLOY=true
-    before_install: env | grep 'TRAVIS'
     install:
     script:
 
