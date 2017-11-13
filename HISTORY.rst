@@ -1,7 +1,7 @@
 0.10 (2017-11-13)
 +++++++++++++++++
 
-* Deprecate the After All feature.
+* Deprecate the After All feature (#93).
   Travis now has `Build Stages`_, which are a better solution.
 
 .. _`Build Stages`: https://docs.travis-ci.com/user/build-stages

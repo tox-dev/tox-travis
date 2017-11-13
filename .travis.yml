@@ -37,6 +37,7 @@ jobs:
     after_success: true
 
 stages:
+  - test
   - name: deploy
     if: tag IS present
 
