@@ -1,5 +1,5 @@
-0.10 (TBD)
-++++++++++
+0.10 (2017-11-13)
++++++++++++++++++
 
 * Deprecate the After All feature.
   Travis now has `Build Stages`_, which are a better solution.
