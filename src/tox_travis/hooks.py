@@ -51,6 +51,13 @@ def tox_configure(config):
         for envconfig in config.envconfigs.values():
             envconfig.ignore_outcome = False
 
+    # after
+    if config.option.travis_after:
+        print('The after all feature has been deprecated. Check out Travis\' '
+              'build stages, which are a better solution. '
+              'See https://tox-travis.readthedocs.io/en/stable/after.html '
+              'for more details.', file=sys.stderr)
+
 
 def tox_subcommand_test_post(config):
     """Wait for this job if the configuration matches."""
