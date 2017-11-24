@@ -1,4 +1,3 @@
-# To activate, change the Appveyor settings to use `.appveyor.yml`.
 environment:
   matrix:
     - TOXENV: py27
@@ -6,14 +5,13 @@ environment:
     - TOXENV: py34
     - TOXENV: py35
     - TOXENV: py36
-
 install:
   - pip install tox
-
-build: false  # Not a C# project, build stuff at the test step instead.
-
+build: false
 test_script:
   - tox
-
 matrix:
   fast_finish: true
+branches:
+  only:
+    - master
