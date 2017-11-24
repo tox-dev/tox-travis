@@ -1,10 +1,11 @@
+environment:
+  matrix:
+    - TOXENV: py27
+    - TOXENV: py36
 install:
   - pip install tox
 build: false
 test_script:
-  - tox -e "py{27,36}"
+  - tox
 matrix:
   fast_finish: true
-branches:
-  only:
-    - master
