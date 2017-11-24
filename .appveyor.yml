@@ -1,15 +1,8 @@
-environment:
-  matrix:
-    - TOXENV: py27
-    - TOXENV: py33
-    - TOXENV: py34
-    - TOXENV: py35
-    - TOXENV: py36
 install:
   - pip install tox
 build: false
 test_script:
-  - tox
+  - tox -e 'py{27,33,34,35,36}'
 matrix:
   fast_finish: true
 branches:
