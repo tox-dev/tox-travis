@@ -123,7 +123,7 @@ class TestToxEnv:
         """Find the envs that tox sees."""
         returncode, stdout, stderr = self.tox_envs_raw(**kwargs)
         assert returncode == 0, stderr
-        return [env for env in stdout.strip().split('\n')]
+        return [env for env in stdout.strip().splitlines()]
 
     def tox_envs_raw(self, ini_filename=None):
         """Return the raw output of finding what tox sees."""
