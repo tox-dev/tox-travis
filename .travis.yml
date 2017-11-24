@@ -26,7 +26,6 @@ stages:
   - name: deploy
     if: tag IS present
 
-if: tag IS present OR branch = master
 jobs:
   fast_finish: true
   include:
