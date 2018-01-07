@@ -11,7 +11,7 @@ need to be run for each Travis job.
 Usage
 =====
 
-Configure the Python versions to test with in ``travis.yml``:
+Configure the Python versions to test with in ``.travis.yml``:
 
 .. code-block:: yaml
 
@@ -75,7 +75,6 @@ For example, see the following ``.travis.yml`` and ``tox.ini``:
           language: generic
     install: pip install tox-travis
     script: tox
-
 
 .. code-block:: ini
 
@@ -141,7 +140,7 @@ be desired, as you might want to control allowed failures inside your
 to ``True``. This will override ``ignore_outcome`` by setting it to
 ``False`` for all environments.
 
-Configure the allowed failures in the build matrix in your ``travis.yml``:
+Configure the allowed failures in the build matrix in your ``.travis.yml``:
 
 .. code-block:: yaml
 
