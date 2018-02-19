@@ -1,4 +1,3 @@
-"""Tests of the --travis-after flag."""
 from tox_travis.hacks import subcommand_test_monkeypatch
 
 
