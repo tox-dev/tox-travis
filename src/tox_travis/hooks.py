@@ -2,7 +2,9 @@
 from __future__ import print_function
 import os
 import sys
-import tox
+
+import pluggy
+
 from .envlist import (
     detect_envlist,
     autogen_envconfigs,
@@ -14,8 +16,10 @@ from .hacks import (
 )
 from .after import travis_after
 
+hookimpl = pluggy.HookimplMarker("tox")
 
-@tox.hookimpl
+
+@hookimpl
 def tox_addoption(parser):
     """Add arguments and needed monkeypatches."""
     parser.add_argument(
@@ -27,7 +31,7 @@ def tox_addoption(parser):
         subcommand_test_monkeypatch(tox_subcommand_test_post)
 
 
-@tox.hookimpl
+@hookimpl
 def tox_configure(config):
     """Check for the presence of the added options."""
     if 'TRAVIS' not in os.environ:
