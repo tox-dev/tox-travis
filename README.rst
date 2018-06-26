@@ -3,7 +3,7 @@ Tox-Travis: Integrate Tox and Travis
 ====================================
 
 .. image:: https://img.shields.io/pypi/v/tox-travis.svg
-   :target: https://pypi.python.org/pypi/tox-travis
+   :target: https://pypi.org/project/tox-travis/
    :alt: Latest Version
 
 .. image:: https://readthedocs.org/projects/tox-travis/badge/?version=stable
