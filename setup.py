@@ -69,10 +69,6 @@ setup(
         'tox': ['travis = tox_travis.hooks'],
     },
     install_requires=['tox>=2.0'],
-    extras_require={
-        ':python_version=="3.2"': ['virtualenv<14', 'pytest<3'],
-        ':platform_python_implementation=="PyPy" and python_version=="3.3"': ['virtualenv>=15.0.2'],
-    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
@@ -82,8 +78,6 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',

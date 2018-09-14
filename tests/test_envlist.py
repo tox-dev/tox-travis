@@ -20,7 +20,7 @@ source =
 
 tox_ini = b"""
 [tox]
-envlist = py26, py27, py32, py33, py34, pypy, pypy3, docs
+envlist = py26, py27, py34, pypy, pypy3, docs
 """
 
 tox_ini_override = tox_ini + b"""
@@ -203,10 +203,7 @@ class TestToxEnv:
     def test_not_travis(self, tmpdir, monkeypatch):
         """Test the results if it's not on a Travis worker."""
         with self.configure(tmpdir, monkeypatch, tox_ini):
-            expected = [
-                'py26', 'py27', 'py32', 'py33', 'py34',
-                'pypy', 'pypy3', 'docs',
-            ]
+            expected = ['py26', 'py27', 'py34', 'pypy', 'pypy3', 'docs']
             assert self.tox_envs() == expected
 
     def test_travis_config_filename(self, tmpdir, monkeypatch):
@@ -225,16 +222,6 @@ class TestToxEnv:
         with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7):
             assert self.tox_envs() == ['py27']
 
-    def test_travis_default_32(self, tmpdir, monkeypatch):
-        """Give the correct env for CPython 3.2."""
-        with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 2):
-            assert self.tox_envs() == ['py32']
-
-    def test_travis_default_33(self, tmpdir, monkeypatch):
-        """Give the correct env for CPython 3.3."""
-        with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 3):
-            assert self.tox_envs() == ['py33']
-
     def test_travis_default_34(self, tmpdir, monkeypatch):
         """Give the correct env for CPython 3.4."""
         with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 4):
@@ -246,8 +233,8 @@ class TestToxEnv:
             assert self.tox_envs() == ['pypy']
 
     def test_travis_default_pypy3(self, tmpdir, monkeypatch):
-        """Give the correct env for PyPy for Python 3.2."""
-        with self.configure(tmpdir, monkeypatch, tox_ini, 'PyPy', 3, 2):
+        """Give the correct env for PyPy for Python 3.5."""
+        with self.configure(tmpdir, monkeypatch, tox_ini, 'PyPy', 3, 5):
             assert self.tox_envs() == ['pypy3']
 
     def test_travis_python_version_py27(self, tmpdir, monkeypatch):
