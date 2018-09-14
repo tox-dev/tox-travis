@@ -44,3 +44,9 @@ tox will only run the ``py27`` or ``py34`` env
 (or envs that have a factor that matches)
 as appropriate for the version of Python
 that is being run by each Travis job.
+
+Listing generated environments
+==============================
+
+You can use ``TRAVIS=true TRAVIS_PYTHON_VERSION=3.6 tox -l`` to see which
+environments would get run.
