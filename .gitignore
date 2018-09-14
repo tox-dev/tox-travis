@@ -5,3 +5,5 @@ __pycache__/
 docs/_build/
 /.coverage*
 /htmlcov/
+/.pytest_cache/
+/.vscode/
