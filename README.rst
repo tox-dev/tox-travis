@@ -1,5 +1,5 @@
 ====================================
-Tox-Travis: Integrate Tox and Travis
+tox-travis: Integrate tox and Travis
 ====================================
 
 .. image:: https://img.shields.io/pypi/v/tox-travis.svg
@@ -20,8 +20,8 @@ Tox-Travis: Integrate Tox and Travis
    :alt: Join the chat at https://gitter.im/tox-dev/tox-travis
    :target: https://gitter.im/tox-dev/tox-travis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-Tox-Travis is a plugin for Tox that simplifies the setup
-between Tox and Travis.
+tox-travis is a plugin for tox that simplifies the setup
+between tox and Travis.
 
 
 Usage
@@ -40,7 +40,7 @@ and install ``tox-travis`` with pip:
     install: pip install tox-travis
     script: tox
 
-Tox will only run the ``py27`` or ``py34`` env
+tox will only run the ``py27`` or ``py34`` env
 (or envs that have a factor that matches)
 as appropriate for the version of Python
 that is being run by each Travis job.
