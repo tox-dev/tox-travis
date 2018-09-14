@@ -20,7 +20,7 @@ Tox-Travis: Integrate Tox and Travis
    :alt: Join the chat at https://gitter.im/tox-dev/tox-travis
    :target: https://gitter.im/tox-dev/tox-travis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
-Tox-Travis is a plugin for Tox that simplifies the setup
+Tox-Travis is a plugin for `Tox <https://pypi.org/project/tox/>`_ that simplifies the setup
 between Tox and Travis.
 
 
