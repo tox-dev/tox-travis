@@ -402,7 +402,7 @@ class TestToxEnv:
             assert self.tox_envs() == ['py35-django110']
 
     def test_legacy_warning(self, tmpdir, monkeypatch):
-        """Using the legacy tox:travis section prints a warining on stderr."""
+        """Using the legacy tox:travis section prints a warning on stderr."""
         tox_ini = tox_ini_legacy_warning
         with self.configure(
             tmpdir, monkeypatch, tox_ini, travis_version='2.7'
