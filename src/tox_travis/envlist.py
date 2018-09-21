@@ -1,13 +1,15 @@
 """Default Tox envlist based on the Travis environment."""
 from __future__ import print_function
-from itertools import product
+
 import os
-import sys
 import re
+import sys
+from itertools import product
+
 import tox.config
 from tox.config import _split_env as split_env
-from .utils import TRAVIS_FACTORS, parse_dict
 
+from .utils import TRAVIS_FACTORS, parse_dict
 
 def detect_envlist(ini):
     """Default envlist automatically based on the Travis environment."""
