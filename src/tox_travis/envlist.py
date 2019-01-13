@@ -68,7 +68,8 @@ def get_declared_envs(ini):
     The envs are expected in a particular order. First the ones
     declared in the envlist, then the other testenvs in order.
     """
-    tox_section = ini.sections.get('tox', {})
+    tox_section_name = 'tox:tox' if ini.path.endswith('setup.cfg') else 'tox'
+    tox_section = ini.sections.get(tox_section_name, {})
     envlist = split_env(tox_section.get('envlist', []))
 
     # Add additional envs that are declared as sections in the ini
