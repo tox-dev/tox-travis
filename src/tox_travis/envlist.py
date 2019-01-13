@@ -1,13 +1,15 @@
 """Default Tox envlist based on the Travis environment."""
 from __future__ import print_function
-from itertools import product
+
 import os
-import sys
 import re
+import sys
+from itertools import product
+
 import tox.config
 from tox.config import _split_env as split_env
-from .utils import TRAVIS_FACTORS, parse_dict
 
+from .utils import TRAVIS_FACTORS, parse_dict
 
 def detect_envlist(ini):
     """Default envlist automatically based on the Travis environment."""
@@ -43,12 +45,15 @@ def autogen_envconfigs(config, envs):
     config.distshare = reader.getpath("distshare", distshare_default)
     reader.addsubstitutions(distshare=config.distshare)
 
+    try:
+        make_envconfig = tox.config.ParseIni.make_envconfig  # tox 3.4.0+
+    except AttributeError:
+        make_envconfig = tox.config.parseini.make_envconfig
+    # Dig past the unbound method in Python 2
+    make_envconfig = getattr(make_envconfig, '__func__', make_envconfig)
+
     # Create the undeclared envs
     for env in envs:
-        make_envconfig = tox.config.parseini.make_envconfig
-        # Dig past the unbound method in Python 2
-        make_envconfig = getattr(make_envconfig, '__func__', make_envconfig)
-
         section = tox.config.testenvprefix + env
         config.envconfigs[env] = make_envconfig(
             config, env, section, reader._subs, config)

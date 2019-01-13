@@ -1,3 +1,10 @@
+0.11 (2018-09-21)
++++++++++++++++++
+
+* Drop support for Python 3.2 and 3.3 (#113).
+* Fix autogen_configs for tox 3.4.0 (#115).
+* Various documentation fixes.
+
 0.10 (2017-11-13)
 +++++++++++++++++
 
