@@ -1,3 +1,12 @@
+0.12 (2019-03-14)
++++++++++++++++++
+
+* Fix reading envlist from ``setup.cfg`` (#110).
+  - thanks to @voronind for the pull request.
+* Add docs and tests to sdist (#121).
+  - thanks to @jayvdb for the pull request.
+* Release an sdist in addition to the wheel.
+
 0.11 (2018-09-21)
 +++++++++++++++++
 
