@@ -1,3 +1,8 @@
+0.13
+++++
+
+* Add Python 3.7 support in trove classifiers.
+
 0.12 (2019-03-14)
 +++++++++++++++++
 
