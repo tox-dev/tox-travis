@@ -15,19 +15,19 @@ Configure the Python versions to test with in ``.travis.yml``:
 
 .. code-block:: yaml
 
-    sudo: false
     language: python
+    dist: xenial
     python:
       - "2.7"
-      - "3.4"
+      - "3.7"
     install: pip install tox-travis
     script: tox
 
 And it will run the appropriate testenvs,
 which by default are any declared env with
-``py27`` or ``py34`` as factors of the name.
+``py27`` or ``py37`` as factors of the name.
 If no environments match a given factor,
-the ``py27`` or ``py34`` envs are used as a fallback.
+the ``py27`` or ``py37`` envs are used as a fallback.
 
 
 Advanced Configuration
@@ -155,4 +155,3 @@ And in your ``tox.ini``:
 
     [travis]
     unignore_outcomes = True
-
