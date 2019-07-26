@@ -15,7 +15,6 @@ Configure the Python versions to test with in ``.travis.yml``:
 
 .. code-block:: yaml
 
-    sudo: false
     language: python
     python:
       - "2.7"
@@ -61,7 +60,6 @@ For example, see the following ``.travis.yml`` and ``tox.ini``:
 
 .. code-block:: yaml
 
-    sudo: false
     language: python
     python:
       - "2.7"
