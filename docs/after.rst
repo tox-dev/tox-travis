@@ -67,7 +67,6 @@ that corresponds to using the above ``travis:after`` section:
 
 .. code-block:: yaml
 
-    sudo: false
     language: python
     python:
       - "2.6"

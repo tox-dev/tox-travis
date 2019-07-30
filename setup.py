@@ -42,7 +42,7 @@ if _markerlib and sys.version_info[0] == 3:
 
     _markerlib.default_environment = default_environment
 
-# Avoid the very buggy pkg_resources.parser, which doesnt consistently
+# Avoid the very buggy pkg_resources.parser, which doesn't consistently
 # recognise the markers needed by this setup.py
 # Change this to setuptools 20.10.0 to support all markers.
 if pkg_resources:
@@ -72,6 +72,7 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
+        'Framework :: tox',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',

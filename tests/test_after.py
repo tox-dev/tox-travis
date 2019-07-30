@@ -194,7 +194,7 @@ class TestAfter:
                         'committed_at': '2016-07-01T21:17:38Z',
                         'committer_email': 'ryan@ryanhiebert.com',
                         'committer_name': 'Ryan Hiebert',
-                        'compare_url': 'https://github.com/ryanhiebert/tox-travis/pull/21',  # noqa
+                        'compare_url': 'https://github.com/tox-dev/tox-travis/pull/21',
                         'id': 40173062,
                         'message': 'Add languages to the mix',
                         'sha': 'f5ba1abff4fa27ea48bf3eac3a924477aea13dd8'},
@@ -293,7 +293,7 @@ class TestAfter:
                         'committed_at': '2016-07-01T21:16:05Z',
                         'committer_email': 'ryan@ryanhiebert.com',
                         'committer_name': 'Ryan Hiebert',
-                        'compare_url': 'https://github.com/ryanhiebert/tox-travis/pull/21',  # noqa
+                        'compare_url': 'https://github.com/tox-dev/tox-travis/pull/21',
                         'id': 40172931,
                         'message': 'Add languages to the mix',
                         'sha': '06e89f20adb11423a538f29d8144abcbe508d575'},

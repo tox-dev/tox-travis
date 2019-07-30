@@ -2,6 +2,7 @@
 import py
 import re
 import subprocess
+import pytest
 from contextlib import contextmanager
 
 
@@ -288,6 +289,13 @@ class TestToxEnv:
         with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7):
             assert self.tox_envs() == ['py27', 'docs']
 
+    # XFAIL because of changes to tox -l to make it show declared envs
+    # rather than the envs that will actually run, which is what we
+    # need to test. When a better option is available, we can get this
+    # test working again.
+    #
+    # # https://github.com/tox-dev/tox/pull/1284#issuecomment-488411553
+    @pytest.mark.xfail
     def test_respect_overridden_toxenv(self, tmpdir, monkeypatch):
         """Ensure that TOXENV if given is not changed."""
         with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 7):

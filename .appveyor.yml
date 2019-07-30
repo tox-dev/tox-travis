@@ -5,11 +5,11 @@ environment:
     - TOXENV: py36
     - TOXENV: py37
 install:
-  - pip install --upgrade setuptools
-  - pip install tox
+  - C:\Python37\python -m pip install -U pip virtualenv setuptools wheel six
+  - C:\Python37\python -m pip install -U tox
 build: false
 test_script:
-  - tox
+  - C:\Python37\scripts\tox
 matrix:
   fast_finish: true
 skip_branch_with_pr: true
