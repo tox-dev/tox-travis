@@ -44,7 +44,9 @@ def tox_configure(config):
                   'envs that Tox should run are declared in the tox config.',
                   file=sys.stderr)
             autogen_envconfigs(config, undeclared)
-        config.envlist = envlist
+        # Also set envlist_default to allow us to inspect outcomes
+        # via tox -l in the tests, until a better solution arrives.
+        config.envlist_default = config.envlist = envlist
 
     # Override ignore_outcomes
     if override_ignore_outcome(ini):
