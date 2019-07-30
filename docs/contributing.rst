@@ -12,7 +12,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/ryanhiebert/tox-travis/issues. If you are
+Report bugs at https://github.com/tox-dev/tox-travis/issues. If you are
 reporting a bug, please include:
 
 * Any details about your local setup that might be helpful in troubleshooting.
@@ -41,7 +41,7 @@ Submit Feedback
 ~~~~~~~~~~~~~~~
 
 The best way to send feedback is to file an issue at
-https://github.com/ryanhiebert/tox-travis/issues. If you are proposing a feature:
+https://github.com/tox-dev/tox-travis/issues. If you are proposing a feature:
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
@@ -88,5 +88,5 @@ Before you submit a pull request, check that it meets these guidelines:
    feature to the list in README.rst.
 3. The pull request should work for Python 2.6, 2.7, 3.4, 3.5, 3.6, 3.7
    and for PyPy, PyPy3.
-   Check https://travis-ci.org/ryanhiebert/tox-travis/pull_requests
+   Check https://travis-ci.org/tox-dev/tox-travis/pull_requests
    and make sure that the tests pass for all supported Python versions.
