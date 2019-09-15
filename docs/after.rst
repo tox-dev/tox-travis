@@ -69,7 +69,7 @@ that corresponds to using the above ``travis:after`` section:
 
     language: python
     python:
-      - "2.6"
+      - "2.7"
       - "3.5"
     env:
       global:
