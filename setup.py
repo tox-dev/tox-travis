@@ -28,7 +28,7 @@ class Python3MarkerDict(dict):
         return self[i]
 
 
-if _markerlib and sys.version_info[0] == 3:
+if _markerlib and sys.version_info[0] >= 3:
     env = _markerlib.markers._VARS
     for key in list(env):
         new_key = key.replace('.', '_')
