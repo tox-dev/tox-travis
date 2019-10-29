@@ -31,7 +31,6 @@ and install ``tox-travis`` with pip:
 
 .. code-block:: yaml
 
-    sudo: false
     language: python
     python:
       - "2.7"
