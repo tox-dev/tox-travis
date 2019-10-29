@@ -28,7 +28,7 @@ class Python3MarkerDict(dict):
         return self[i]
 
 
-if _markerlib and sys.version_info[0] == 3:
+if _markerlib and sys.version_info[0] >= 3:
     env = _markerlib.markers._VARS
     for key in list(env):
         new_key = key.replace('.', '_')
@@ -69,6 +69,7 @@ setup(
         'tox': ['travis = tox_travis.hooks'],
     },
     install_requires=['tox>=2.0'],
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
