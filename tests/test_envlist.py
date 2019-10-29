@@ -21,7 +21,7 @@ source =
 
 tox_ini = b"""
 [tox]
-envlist = py26, py27, py34, pypy, pypy3, docs
+envlist = py27, py34, pypy, pypy3, docs
 """
 
 tox_ini_override = tox_ini + b"""
@@ -204,7 +204,7 @@ class TestToxEnv:
     def test_not_travis(self, tmpdir, monkeypatch):
         """Test the results if it's not on a Travis worker."""
         with self.configure(tmpdir, monkeypatch, tox_ini):
-            expected = ['py26', 'py27', 'py34', 'pypy', 'pypy3', 'docs']
+            expected = ['py27', 'py34', 'pypy', 'pypy3', 'docs']
             assert self.tox_envs() == expected
 
     def test_travis_config_filename(self, tmpdir, monkeypatch):
@@ -212,11 +212,6 @@ class TestToxEnv:
         with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 3, 6,
                             ini_filename='spam.ini'):
             assert self.tox_envs(ini_filename='spam.ini') == ['py36']
-
-    def test_travis_default_26(self, tmpdir, monkeypatch):
-        """Give the correct env for CPython 2.6."""
-        with self.configure(tmpdir, monkeypatch, tox_ini, 'CPython', 2, 6):
-            assert self.tox_envs() == ['py26']
 
     def test_travis_default_27(self, tmpdir, monkeypatch):
         """Give the correct env for CPython 2.7."""
