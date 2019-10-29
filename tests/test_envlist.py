@@ -204,7 +204,7 @@ class TestToxEnv:
     def test_not_travis(self, tmpdir, monkeypatch):
         """Test the results if it's not on a Travis worker."""
         with self.configure(tmpdir, monkeypatch, tox_ini):
-            expected = ['py27', 'py37', 'pypy', 'pypy3', 'docs']
+            expected = ['py27', 'py34', 'pypy', 'pypy3', 'docs']
             assert self.tox_envs() == expected
 
     def test_travis_config_filename(self, tmpdir, monkeypatch):
