@@ -4,6 +4,7 @@ environment:
     - TOXENV: py34
     - TOXENV: py35
     - TOXENV: py36
+    - TOXENV: py37
 install:
   - C:\Python37\python -m pip install -U pip virtualenv setuptools wheel six
   - C:\Python37\python -m pip install -U tox

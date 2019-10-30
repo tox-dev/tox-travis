@@ -33,12 +33,12 @@ and install ``tox-travis`` with pip:
 
     language: python
     python:
-      - "2.7"
-      - "3.4"
+      - "3.6"
+      - "3.7"
     install: pip install tox-travis
     script: tox
 
-tox will only run the ``py27`` or ``py34`` env
+tox will only run the ``py36`` or ``py37`` env
 (or envs that have a factor that matches)
 as appropriate for the version of Python
 that is being run by each Travis job.
