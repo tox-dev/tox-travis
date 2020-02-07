@@ -25,7 +25,6 @@ jobs:
   fast_finish: true
   include:
     - python: 3.8
-      sudo: true
 
     - python: 3.8
       env: TOXENV=docs
