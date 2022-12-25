@@ -153,4 +153,3 @@ And in your ``tox.ini``:
 
     [travis]
     unignore_outcomes = True
-
