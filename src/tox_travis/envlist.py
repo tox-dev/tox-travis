@@ -4,12 +4,14 @@ from __future__ import print_function
 import os
 import re
 import sys
-from itertools import product
+import itertools
 
 import tox.config
-from tox.config import _split_env as split_env
 
 from .utils import TRAVIS_FACTORS, parse_dict
+from .v4_workarounds import _split_env as split_env
+
+
 
 def detect_envlist(ini):
     """Default envlist automatically based on the Travis environment."""
@@ -20,7 +22,7 @@ def detect_envlist(ini):
     desired_factors = get_desired_factors(ini)
 
     # Reduce desired factors
-    desired_envs = ['-'.join(env) for env in product(*desired_factors)]
+    desired_envs = ['-'.join(env) for env in itertools.product(*desired_factors)]
 
     # Find matching envs
     return match_envs(declared_envs, desired_envs,

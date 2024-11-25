@@ -5,7 +5,7 @@ import sys
 import json
 import time
 
-from tox.config import _split_env as split_env
+from .v4_workarounds import _split_env as split_env
 try:
     import urllib.request as urllib2
 except ImportError:

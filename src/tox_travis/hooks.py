@@ -3,6 +3,7 @@ from __future__ import print_function
 import os
 import sys
 import tox
+from tox.plugin import impl
 from .envlist import (
     detect_envlist,
     autogen_envconfigs,
@@ -15,8 +16,8 @@ from .hacks import (
 from .after import travis_after
 
 
-@tox.hookimpl
-def tox_addoption(parser):
+@impl
+def tox_add_option(parser):
     """Add arguments and needed monkeypatches."""
     parser.add_argument(
         '--travis-after', dest='travis_after', action='store_true',
@@ -27,12 +28,13 @@ def tox_addoption(parser):
         subcommand_test_monkeypatch(tox_subcommand_test_post)
 
 
-@tox.hookimpl
-def tox_configure(config):
+@impl
+def tox_add_env_config(env_conf, state):
     """Check for the presence of the added options."""
     if 'TRAVIS' not in os.environ:
         return
 
+    config = env_conf
     ini = config._cfg
 
     # envlist

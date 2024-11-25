@@ -68,7 +68,7 @@ setup(
     entry_points={
         'tox': ['travis = tox_travis.hooks'],
     },
-    install_requires=['tox>=2.0,<4'],
+    install_requires=['tox>=2.0'],
     python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     classifiers=[
         'Development Status :: 4 - Beta',
